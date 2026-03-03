@@ -2,6 +2,8 @@ const express = require("express");
 const auth = require("../middlewares/auth");
 const allowRoles = require("../middlewares/role");
 
+const { body, validationResult } = require("express-validator");
+
 const Test = require("../models/Test");
 const Question = require("../models/question");
 
@@ -19,8 +21,23 @@ router.post(
   "/quizzes",
   auth,
   allowRoles("instructor", "admin"),
+
+  // 🔥 Validation rules
+  [
+    body("title").notEmpty().withMessage("Title is required"),
+    body("subject").notEmpty().withMessage("Subject is required"),
+    body("duration")
+      .isInt({ min: 1 })
+      .withMessage("Duration must be positive number"),
+  ],
+
   async (req, res) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       const { title, subject, category, duration } = req.body;
 
       const test = await Test.create({
@@ -34,9 +51,9 @@ router.post(
 
       res.status(201).json(test);
     } catch (err) {
-      res.status(500).json({ error: "Failed to create test" + err.message });
+      res.status(500).json({ error: "Failed to create test" });
     }
-  },
+  }
 );
 
 /**
