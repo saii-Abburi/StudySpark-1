@@ -6,7 +6,7 @@ const auth = require("../middlewares/auth");
 const allowRoles = require("../middlewares/role");
 const uploadPDF = require("../middlewares/resourceUpload");
 
-const Resource = require("../models/Resource");
+const Resource = require("../models/Resources");
 
 const router = express.Router();
 
