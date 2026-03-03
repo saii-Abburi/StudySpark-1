@@ -289,7 +289,7 @@ router.delete(
 
 /**
  * GET /instructor/questions
- * Filter questions from question bank
+ * Filter + Pagination
  */
 router.get(
   "/questions",
@@ -297,11 +297,19 @@ router.get(
   allowRoles("instructor", "admin"),
   async (req, res) => {
     try {
-      const { subject, chapter, topic, difficulty, isPYQ, importance } =
-        req.query;
+      const {
+        subject,
+        chapter,
+        topic,
+        difficulty,
+        isPYQ,
+        importance,
+        page = 1,
+        limit = 10,
+      } = req.query;
 
       const filter = {
-        createdBy: req.user._id, // only show instructor's questions
+        createdBy: req.user._id,
       };
 
       if (subject) filter.subject = subject;
@@ -311,11 +319,22 @@ router.get(
       if (importance) filter.importance = importance;
       if (isPYQ !== undefined) filter.isPYQ = isPYQ === "true";
 
-      const questions = await Question.find(filter).select(
-        "-correctOption -explanation",
-      );
+      const pageNumber = Number(page);
+      const limitNumber = Number(limit);
+      const skip = (pageNumber - 1) * limitNumber;
+
+      const total = await Question.countDocuments(filter);
+
+      const questions = await Question.find(filter)
+        .select("-correctOption -explanation")
+        .skip(skip)
+        .limit(limitNumber)
+        .sort({ createdAt: -1 });
 
       res.json({
+        total,
+        page: pageNumber,
+        totalPages: Math.ceil(total / limitNumber),
         count: questions.length,
         questions,
       });
@@ -324,7 +343,7 @@ router.get(
         error: "Failed to fetch questions",
       });
     }
-  },
+  }
 );
 
 /**
@@ -387,6 +406,111 @@ router.post(
     } catch (err) {
       res.status(500).json({
         error: "Generation failed",
+        details: err.message,
+      });
+    }
+  }
+);
+
+/**
+ * PUT /instructor/questions/:questionId
+ * Edit question
+ */
+router.put(
+  "/questions/:questionId",
+  auth,
+  allowRoles("instructor", "admin"),
+  async (req, res) => {
+    try {
+      const question = await Question.findById(req.params.questionId);
+
+      if (!question) {
+        return res.status(404).json({ error: "Question not found" });
+      }
+
+      // Ownership check
+      if (question.createdBy.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          error: "You are not allowed to edit this question",
+        });
+      }
+
+      const allowedUpdates = [
+        "questionText",
+        "options",
+        "correctOption",
+        "explanation",
+        "marks",
+        "negativeMarks",
+        "subject",
+        "chapter",
+        "topic",
+        "difficulty",
+        "examYear",
+        "isPYQ",
+        "isRepeated",
+        "importance",
+      ];
+
+      allowedUpdates.forEach((field) => {
+        if (req.body[field] !== undefined) {
+          question[field] = req.body[field];
+        }
+      });
+
+      await question.save();
+
+      res.json({
+        message: "Question updated successfully",
+        question,
+      });
+    } catch (err) {
+      res.status(500).json({
+        error: "Failed to update question",
+        details: err.message,
+      });
+    }
+  }
+);
+
+/**
+ * DELETE /instructor/questions/:questionId
+ * Delete question safely
+ */
+router.delete(
+  "/questions/:questionId",
+  auth,
+  allowRoles("instructor", "admin"),
+  async (req, res) => {
+    try {
+      const question = await Question.findById(req.params.questionId);
+
+      if (!question) {
+        return res.status(404).json({ error: "Question not found" });
+      }
+
+      // Ownership check
+      if (question.createdBy.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          error: "You are not allowed to delete this question",
+        });
+      }
+
+      // Remove question from all tests
+      await Test.updateMany(
+        { questions: question._id },
+        { $pull: { questions: question._id } }
+      );
+
+      // Delete question
+      await question.deleteOne();
+
+      res.json({
+        message: "Question deleted successfully",
+      });
+    } catch (err) {
+      res.status(500).json({
+        error: "Failed to delete question",
         details: err.message,
       });
     }
