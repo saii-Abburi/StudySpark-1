@@ -140,7 +140,7 @@ const TestTakingInterface = () => {
             <h1 className="text-xl font-black text-white capitalize truncate w-48 sm:w-auto tracking-normal">
               {test?.title || 'Active Test'}
             </h1>
-            <span className="hidden sm:inline-block px-3 py-1 bg-dark-900 border border-dark-700 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+            <span className="hidden sm:inline-block px-3 py-1 bg-dark-900 border border-dark-700 text-slate-200 text-xs font-bold uppercase tracking-widest">
               Question {currentIdx + 1} of {questions.length}
             </span>
           </div>
@@ -177,7 +177,7 @@ const TestTakingInterface = () => {
               className={`px-6 py-3 text-xs font-black uppercase tracking-widest transition-colors border ${
                 questions[currentIdx]?.subject === sub
                   ? 'bg-primary-500/10 text-primary-500 border-primary-500/50 border-b-primary-500 shadow-[inset_0_-2px_0_theme(colors.primary.500)]'
-                  : 'bg-dark-900 text-slate-500 hover:bg-dark-800 border-dark-700 hover:text-white'
+                  : 'bg-dark-900 text-slate-300 hover:bg-dark-800 border-dark-700 hover:text-white'
               }`}
             >
               {sub}
@@ -197,14 +197,14 @@ const TestTakingInterface = () => {
             <div className="absolute top-6 right-6 flex space-x-2">
                <button 
                  onClick={() => setReportModalOpen(true)}
-                 className="p-2 text-slate-500 hover:text-amber-500 hover:bg-dark-900 border border-transparent hover:border-amber-500/20 transition-colors"
+                 className="p-2 text-slate-300 hover:text-amber-500 hover:bg-dark-900 border border-transparent hover:border-amber-500/20 transition-colors"
                  title="Report Question"
                >
                  <Flag className="w-5 h-5" />
                </button>
                <button 
                  onClick={() => handleBookmark(currentQ._id)}
-                 className="p-2 text-slate-500 hover:text-primary-500 hover:bg-dark-900 border border-transparent hover:border-primary-500/20 transition-colors"
+                 className="p-2 text-slate-300 hover:text-primary-500 hover:bg-dark-900 border border-transparent hover:border-primary-500/20 transition-colors"
                  title="Bookmark Question"
                >
                  <BookMarked className="w-5 h-5" />
@@ -212,13 +212,13 @@ const TestTakingInterface = () => {
             </div>
 
             <div className="mb-8 pr-24">
-              <span className="inline-block px-3 py-1 bg-dark-900 border border-dark-700 text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-4">
+              <span className="inline-block px-3 py-1 bg-dark-900 border border-dark-700 text-slate-300 text-xs font-bold uppercase tracking-widest mb-4">
                 Question {currentIdx + 1}
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
                 {currentQ?.questionText}
               </h2>
-              <div className="mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <div className="mt-4 text-xs font-bold text-slate-300 uppercase tracking-widest">
                 Marks: <span className="text-green-500 ml-1">+{currentQ?.marks || 4}</span>
               </div>
             </div>
@@ -237,7 +237,7 @@ const TestTakingInterface = () => {
                   <div className={`w-8 h-8 border flex items-center justify-center mr-5 shrink-0 transition-colors text-xs font-bold uppercase ${
                     currentQ && answers[currentQ._id] === opt 
                       ? 'bg-primary-500 border-primary-500 text-white' 
-                      : 'bg-dark-800 border-dark-700 text-slate-500'
+                      : 'bg-dark-800 border-dark-700 text-slate-300'
                   }`}>
                     {opt}
                   </div>
@@ -301,7 +301,7 @@ const TestTakingInterface = () => {
                   } ${
                     isAnswered 
                       ? 'bg-primary-500 border-primary-500 text-white hover:bg-primary-600' 
-                      : (!isCurrent ? 'bg-dark-900 text-slate-400 border-dark-700 hover:bg-dark-700' : 'bg-dark-900')
+                      : (!isCurrent ? 'bg-dark-900 text-slate-200 border-dark-700 hover:bg-dark-700' : 'bg-dark-900')
                   }`}
                 >
                   {idx + 1}
@@ -311,11 +311,11 @@ const TestTakingInterface = () => {
           </div>
 
           <div className="mt-8 space-y-4 border-t border-dark-700 pt-6">
-            <div className="flex items-center text-xs font-bold uppercase tracking-widest text-slate-400">
+            <div className="flex items-center text-xs font-bold uppercase tracking-widest text-slate-200">
               <div className="w-3 h-3 bg-primary-500 mr-3"></div>
               Answered ({Object.keys(answers).length})
             </div>
-            <div className="flex items-center text-xs font-bold uppercase tracking-widest text-slate-400">
+            <div className="flex items-center text-xs font-bold uppercase tracking-widest text-slate-200">
               <div className="w-3 h-3 bg-dark-900 border border-dark-700 mr-3"></div>
               Unanswered ({questions.length - Object.keys(answers).length})
             </div>
@@ -331,7 +331,7 @@ const TestTakingInterface = () => {
               <AlertTriangle className="w-6 h-6 mr-2" />
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">Report Question</h2>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+            <p className="text-slate-300 dark:text-slate-200 text-sm mb-6">
               Found an issue with this question? Let our instructors know.
             </p>
 

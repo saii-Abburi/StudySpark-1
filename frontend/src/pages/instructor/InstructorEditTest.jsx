@@ -86,7 +86,7 @@ const InstructorEditTest = () => {
           </Link>
           <div>
             <h1 className="text-3xl font-black text-white uppercase tracking-tight">Edit Questions</h1>
-            <p className="text-slate-400 font-bold tracking-widest uppercase text-xs mt-1">Test ID: {testId}</p>
+            <p className="text-slate-200 font-bold tracking-widest uppercase text-xs mt-1">Test ID: {testId}</p>
           </div>
         </div>
       </div>
@@ -98,7 +98,7 @@ const InstructorEditTest = () => {
         </div>
       ) : questions.length === 0 ? (
         <div className="bg-dark-800 p-12 text-center border border-dark-700 shadow-sm">
-          <p className="text-slate-400 font-medium">No questions found for this test. Try uploading a CSV on the dashboard.</p>
+          <p className="text-slate-200 font-medium">No questions found for this test. Try uploading a CSV on the dashboard.</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -111,7 +111,7 @@ const InstructorEditTest = () => {
                   <div className="flex items-center justify-between border-b border-dark-700 pb-4">
                     <h3 className="text-lg font-black text-white uppercase tracking-wide">Editing Question {index + 1}</h3>
                     <div className="flex space-x-3">
-                       <button onClick={handleCancelEdit} className="p-2 text-slate-500 hover:text-white bg-dark-900 hover:bg-dark-700 border border-dark-700 transition-colors">
+                       <button onClick={handleCancelEdit} className="p-2 text-slate-300 hover:text-white bg-dark-900 hover:bg-dark-700 border border-dark-700 transition-colors">
                          <X className="w-5 h-5" />
                        </button>
                        <button onClick={handleSaveEdit} disabled={saveLoading} className="flex items-center px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-widest transition-colors disabled:opacity-50">
@@ -123,9 +123,9 @@ const InstructorEditTest = () => {
 
                   <div className="space-y-6 mt-6">
                     <div>
-                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Question Text</label>
+                      <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Question Text</label>
                       <textarea 
-                        className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold resize-none"
+                        className="w-full px-5 py-4 bg-black/40 border border-dark-700 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 text-slate-100 font-medium text-sm leading-relaxed resize-none shadow-inner"
                         rows="3"
                         value={editForm.questionText}
                         onChange={(e) => setEditForm({...editForm, questionText: e.target.value})}
@@ -135,10 +135,10 @@ const InstructorEditTest = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-l-4 border-primary-500 pl-6 py-2 bg-dark-900/50 p-4">
                       {['A', 'B', 'C', 'D'].map(opt => (
                         <div key={opt}>
-                          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Option {opt}</label>
+                          <label className="block text-xs font-bold text-secondary-500 uppercase tracking-widest mb-2">Option {opt}</label>
                           <input 
                             type="text" 
-                            className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-medium"
+                            className="w-full px-4 py-3 bg-black/40 border border-dark-700 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 text-slate-100 font-medium text-sm shadow-inner"
                             value={editForm.options[opt]}
                             onChange={(e) => setEditForm({
                               ...editForm, 
@@ -151,9 +151,9 @@ const InstructorEditTest = () => {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-dark-700">
                       <div>
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Correct Answer</label>
+                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Correct Answer</label>
                         <select 
-                          className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white uppercase font-bold text-xs"
+                          className="w-full px-4 py-3 bg-black/40 border border-dark-700 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 text-slate-100 uppercase font-bold text-xs shadow-inner"
                           value={editForm.correctAnswer}
                           onChange={(e) => setEditForm({...editForm, correctAnswer: e.target.value})}
                         >
@@ -161,27 +161,27 @@ const InstructorEditTest = () => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Marks (+)</label>
+                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Marks (+)</label>
                         <input 
                           type="number" 
-                          className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold"
+                          className="w-full px-4 py-3 bg-black/40 border border-dark-700 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 text-slate-100 font-bold text-xs shadow-inner"
                           value={editForm.marks}
                           onChange={(e) => setEditForm({...editForm, marks: Number(e.target.value)})}
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Marks (-)</label>
+                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Marks (-)</label>
                         <input 
                           type="number" 
-                          className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold"
+                          className="w-full px-4 py-3 bg-black/40 border border-dark-700 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 text-slate-100 font-bold text-xs shadow-inner"
                           value={editForm.negativeMarks}
                           onChange={(e) => setEditForm({...editForm, negativeMarks: Number(e.target.value)})}
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Difficulty</label>
+                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Difficulty</label>
                         <select 
-                          className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white uppercase font-bold text-xs"
+                          className="w-full px-4 py-3 bg-black/40 border border-dark-700 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 text-slate-100 uppercase font-bold text-xs shadow-inner"
                           value={editForm.difficulty}
                           onChange={(e) => setEditForm({...editForm, difficulty: e.target.value})}
                         >
@@ -199,14 +199,14 @@ const InstructorEditTest = () => {
                   <div className="flex-1 pr-6 mb-4 md:mb-0">
                     <div className="flex items-center space-x-4 mb-4">
                       <span className="text-sm font-black text-primary-500 uppercase">Q{index + 1}.</span>
-                      <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest border ${
+                      <span className={`px-2 py-1 text-xs font-bold uppercase tracking-widest border ${
                         q.difficulty === 'easy' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
                         q.difficulty === 'hard' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
                         'bg-amber-500/10 text-amber-500 border-amber-500/20'
                       }`}>
                         {q.difficulty || 'medium'}
                       </span>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-dark-900 border border-dark-700 px-3 py-1">
+                      <span className="text-xs font-bold text-slate-300 uppercase tracking-widest bg-dark-900 border border-dark-700 px-3 py-1">
                         +{q.marks || 4} / -{q.negativeMarks || 0}
                       </span>
                     </div>

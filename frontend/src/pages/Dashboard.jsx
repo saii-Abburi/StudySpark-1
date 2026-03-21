@@ -84,7 +84,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                 Study<span className="text-primary-500">Spark</span>
               </span>
             </Link>
-            <button className="lg:hidden text-slate-500 hover:text-white" onClick={() => setIsOpen(false)}>
+            <button className="lg:hidden text-slate-300 hover:text-white" onClick={() => setIsOpen(false)}>
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -116,10 +116,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                   className={`flex items-center px-4 py-3 transition-all ${
                     isActive 
                     ? 'bg-primary-500/10 text-primary-500 border-r-2 border-primary-500 font-bold tracking-wider' 
-                    : 'text-slate-400 hover:bg-dark-800 hover:text-white font-medium tracking-wide'
+                    : 'text-slate-200 hover:bg-dark-800 hover:text-white font-medium tracking-wide'
                   }`}
                 >
-                  <span className={`${isActive ? 'text-primary-500' : 'text-slate-500'} mr-3`}>
+                  <span className={`${isActive ? 'text-primary-500' : 'text-slate-300'} mr-3`}>
                     {item.icon}
                   </span>
                   {item.name}
@@ -130,15 +130,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                   <div className="pt-2 pb-2 block border-b border-dark-800/50 mb-2">
                     <button 
                       onClick={() => setTestsExpanded(!testsExpanded)}
-                      className="w-full flex items-center justify-between px-4 py-3 text-slate-400 hover:bg-dark-800 hover:text-white font-medium tracking-wide transition-all"
+                      className="w-full flex items-center justify-between px-4 py-3 text-slate-200 hover:bg-dark-800 hover:text-white font-medium tracking-wide transition-all"
                     >
                       <div className="flex items-center">
-                        <ClipboardList className="h-5 w-5 mr-3 text-slate-500" />
+                        <ClipboardList className="h-5 w-5 mr-3 text-slate-300" />
                         Tests
                       </div>
                       <Plus 
                         className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
-                          testsExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-500'
+                          testsExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-300'
                         }`} 
                       />
                     </button>
@@ -148,40 +148,40 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         {/* Mock Tests */}
                         <button 
                           onClick={() => setMockExpanded(!mockExpanded)}
-                          className="w-full flex items-center justify-between py-2 text-sm text-slate-400 hover:text-white transition-colors"
+                          className="w-full flex items-center justify-between py-2 text-sm text-slate-200 hover:text-white transition-colors"
                         >
                           <span>Mock Tests</span>
                           <Plus 
                             className={`h-3 w-3 transition-transform duration-300 ease-in-out ${
-                              mockExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-400'
+                              mockExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-200'
                             }`} 
                           />
                         </button>
                         {mockExpanded && (
                           <div className="pl-4 space-y-1 mb-2">
-                            <Link to="/dashboard/tests/mock/medical" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-500 hover:text-primary-500">Medical</Link>
-                            <Link to="/dashboard/tests/mock/engineering" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-500 hover:text-primary-500">Engineering</Link>
+                            <Link to="/dashboard/tests/mock/medical" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Medical</Link>
+                            <Link to="/dashboard/tests/mock/engineering" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Engineering</Link>
                           </div>
                         )}
                         
                         {/* Chapter-wise Tests */}
                         <button 
                           onClick={() => setChapterExpanded(!chapterExpanded)}
-                          className="w-full flex items-center justify-between py-2 text-sm text-slate-400 hover:text-white transition-colors"
+                          className="w-full flex items-center justify-between py-2 text-sm text-slate-200 hover:text-white transition-colors"
                         >
                           <span>Chapter-wise</span>
                           <Plus 
                             className={`h-3 w-3 transition-transform duration-300 ease-in-out ${
-                              chapterExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-400'
+                              chapterExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-200'
                             }`} 
                           />
                         </button>
                         {chapterExpanded && (
                           <div className="pl-4 space-y-1 mb-2">
-                            <Link to="/dashboard/tests/chapter-wise/biology" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-500 hover:text-primary-500">Biology</Link>
-                            <Link to="/dashboard/tests/chapter-wise/physics" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-500 hover:text-primary-500">Physics</Link>
-                            <Link to="/dashboard/tests/chapter-wise/chemistry" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-500 hover:text-primary-500">Chemistry</Link>
-                            <Link to="/dashboard/tests/chapter-wise/maths" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-500 hover:text-primary-500">Maths</Link>
+                            <Link to="/dashboard/tests/chapter-wise/biology" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Biology</Link>
+                            <Link to="/dashboard/tests/chapter-wise/physics" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Physics</Link>
+                            <Link to="/dashboard/tests/chapter-wise/chemistry" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Chemistry</Link>
+                            <Link to="/dashboard/tests/chapter-wise/maths" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Maths</Link>
                           </div>
                         )}
                       </div>
@@ -197,7 +197,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <div className="p-4 border-t border-dark-800">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-start px-4 py-3 text-slate-400 hover:bg-dark-800 hover:text-primary-500 transition-colors font-medium tracking-wide cursor-pointer uppercase text-sm"
+              className="w-full flex items-center justify-start px-4 py-3 text-slate-200 hover:bg-dark-800 hover:text-primary-500 transition-colors font-medium tracking-wide cursor-pointer uppercase text-sm"
             >
               <LogOut className="h-5 w-5 mr-3" />
               Sign Out
@@ -215,7 +215,7 @@ const Header = ({ setIsOpen }) => {
       <div className="flex items-center">
         <button 
           onClick={() => setIsOpen(true)}
-          className="lg:hidden mr-4 text-slate-400 hover:text-white transition-colors"
+          className="lg:hidden mr-4 text-slate-200 hover:text-white transition-colors"
         >
           <Menu className="h-6 w-6" />
         </button>
@@ -223,7 +223,7 @@ const Header = ({ setIsOpen }) => {
         {/* Search */}
         <div className="relative hidden sm:block w-64 md:w-96">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-500" />
+            <Search className="h-5 w-5 text-slate-300" />
           </div>
           <input
             type="text"
@@ -234,7 +234,7 @@ const Header = ({ setIsOpen }) => {
       </div>
 
       <div className="flex items-center space-x-4">
-        <button className="relative p-2 text-slate-400 hover:text-white transition-colors border border-transparent hover:border-dark-700 bg-dark-800">
+        <button className="relative p-2 text-slate-200 hover:text-white transition-colors border border-transparent hover:border-dark-700 bg-dark-800">
           <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-primary-500 ring-2 ring-dark-800"></span>
           <Bell className="h-5 w-5" />
         </button>

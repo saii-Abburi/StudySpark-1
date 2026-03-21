@@ -57,9 +57,12 @@ export const instructorService = {
   getQuestionsForQuiz: (testId) => api.get(`/instructor/quizzes/${testId}/questions`),
   createQuiz: (quizData) => api.post('/instructor/quizzes', quizData),
   deleteQuiz: (testId) => api.delete(`/instructor/quizzes/${testId}`),
-  uploadQuestionsCSV: (testId, formData) => api.post(`/instructor/quizzes/${testId}/upload-csv`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  uploadQuestionsCSV: (testId, formData, encodedLimits = '') => {
+    const query = encodedLimits ? `?limits=${encodedLimits}` : '';
+    return api.post(`/instructor/quizzes/${testId}/upload-csv${query}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
   editQuestion: (questionId, questionData) => api.put(`/instructor/questions/${questionId}`, questionData),
   
   // Phase 3 Extensions

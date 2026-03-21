@@ -73,7 +73,7 @@ const StudentOverview = () => {
              <span className="w-8 h-1 bg-primary-500 mr-3"></span>
              My Dashboard
           </h1>
-          <p className="text-slate-400 font-medium tracking-wide mt-2">Track your progress and take new tests.</p>
+          <p className="text-slate-200 font-medium tracking-wide mt-2">Track your progress and take new tests.</p>
         </div>
       </div>
 
@@ -89,37 +89,37 @@ const StudentOverview = () => {
         <div className="bg-dark-800 p-6 border-l-4 border-l-primary-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 shrink-0">
           <div className="flex items-center text-primary-500 mb-4">
             <Target className="w-5 h-5 mr-2" />
-            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-400">Total Tests</h3>
+            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-200">Total Tests</h3>
           </div>
           <div className="text-3xl font-black text-white">{completedAttempts.length}</div>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">{activeAttempts.length} in progress</p>
+          <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">{activeAttempts.length} in progress</p>
         </div>
         
         <div className="bg-dark-800 p-6 border-l-4 border-l-green-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 shrink-0">
           <div className="flex items-center text-green-500 mb-4">
             <Award className="w-5 h-5 mr-2" />
-            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-400">Avg Score</h3>
+            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-200">Avg Score</h3>
           </div>
           <div className="text-3xl font-black text-white">{avgScore}</div>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Points per test</p>
+          <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">Points per test</p>
         </div>
 
         <div className="bg-dark-800 p-6 border-l-4 border-l-indigo-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 shrink-0">
           <div className="flex items-center text-indigo-500 mb-4">
             <Activity className="w-5 h-5 mr-2" />
-            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-400">Total Points</h3>
+            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-200">Total Points</h3>
           </div>
           <div className="text-3xl font-black text-white">{totalScore}</div>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Lifetime earnings</p>
+          <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">Lifetime earnings</p>
         </div>
         
         <div className="bg-dark-800 p-6 border-l-4 border-l-amber-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 shrink-0">
           <div className="flex items-center text-amber-500 mb-4">
             <BookOpen className="w-5 h-5 mr-2" />
-            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-400">Available</h3>
+            <h3 className="font-bold text-xs uppercase tracking-widest text-slate-200">Available</h3>
           </div>
           <div className="text-3xl font-black text-white">{tests.length}</div>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">New tests ready</p>
+          <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">New tests ready</p>
         </div>
       </div>
 
@@ -139,7 +139,7 @@ const StudentOverview = () => {
                   <Activity className="w-8 h-8 text-slate-600" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-wide">No attempts yet</h3>
-                <p className="text-slate-400 font-medium">Start a test to see your history here.</p>
+                <p className="text-slate-200 font-medium">Start a test to see your history here.</p>
               </div>
             ) : (
               <div className="divide-y divide-dark-700">
@@ -155,7 +155,7 @@ const StudentOverview = () => {
                       </div>
                       <div>
                         <h4 className="text-lg font-bold text-white leading-snug">{attempt.test?.title || 'Unknown Test'}</h4>
-                        <div className="flex flex-wrap items-center mt-2 gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        <div className="flex flex-wrap items-center mt-2 gap-x-4 gap-y-2 text-xs font-bold uppercase tracking-widest text-slate-200">
                           <span className="flex items-center text-primary-500">
                             {attempt.test?.subject}
                           </span>
@@ -219,7 +219,7 @@ const StudentOverview = () => {
           
           <div className="space-y-4">
             {tests.length === 0 ? (
-              <div className="bg-dark-800 border border-dark-700 p-8 text-center text-slate-500 font-bold text-xs uppercase tracking-widest">
+              <div className="bg-dark-800 border border-dark-700 p-8 text-center text-slate-300 font-bold text-xs uppercase tracking-widest">
                 No new tests right now
               </div>
             ) : (
@@ -229,7 +229,7 @@ const StudentOverview = () => {
                 
                 return (
                   <div key={test._id} className="bg-dark-800 p-6 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 hover:bg-dark-800/80 transition-colors group relative border-l-4 border-l-amber-500">
-                    <span className="inline-block px-2 py-1 bg-dark-900 border border-dark-700 text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3">
+                    <span className="inline-block px-2 py-1 bg-dark-900 border border-dark-700 text-slate-200 text-xs font-bold uppercase tracking-widest mb-3">
                       {test.testType === 'mock' 
                         ? (test.category === 'engineering' ? '80 Maths • 40 Physics • 40 Chemistry' : '80 Biology • 40 Physics • 40 Chemistry')
                         : test.subject} • {test.duration}m
@@ -237,15 +237,15 @@ const StudentOverview = () => {
                     <h3 className="text-lg font-bold text-white mb-4 leading-snug pr-4">{test.title}</h3>
                     
                     <div className="flex items-center justify-between mt-6">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                      <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">
                         {test.totalMarks ? `${test.totalMarks} Marks` : 'Unmarked'}
                       </span>
                       {hasActiveAttempt ? (
-                         <span className="text-amber-500 text-[10px] font-bold uppercase tracking-widest">In Progress</span>
+                         <span className="text-amber-500 text-xs font-bold uppercase tracking-widest">In Progress</span>
                       ) : (
                         <button 
                           onClick={() => handleStartTest(test._id)}
-                          className="w-10 h-10 rounded-full bg-dark-900 border border-dark-700 hover:border-amber-500 hover:bg-amber-500/10 text-slate-400 hover:text-amber-500 flex items-center justify-center transition-all group-hover:scale-110"
+                          className="w-10 h-10 rounded-full bg-dark-900 border border-dark-700 hover:border-amber-500 hover:bg-amber-500/10 text-slate-200 hover:text-amber-500 flex items-center justify-center transition-all group-hover:scale-110"
                         >
                           <Play className="w-4 h-4 ml-1" />
                         </button>

@@ -42,7 +42,7 @@ export default function Register() {
         <h2 className="mt-8 text-center text-4xl font-black text-white tracking-tight leading-none">
           Join the platform
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-400 font-medium">
+        <p className="mt-2 text-center text-sm text-slate-200 font-medium">
           Already have an account?{' '}
           <Link to="/login" className="font-bold text-primary-500 hover:text-primary-400 transition-colors uppercase tracking-wider text-xs">
             Sign in instead
@@ -62,12 +62,12 @@ export default function Register() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <label htmlFor="firstName" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
                   First Name
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-slate-500" />
+                    <User className="h-5 w-5 text-slate-300" />
                   </div>
                   <input
                     id="firstName"
@@ -82,7 +82,7 @@ export default function Register() {
                 </div>
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <label htmlFor="lastName" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
                   Last Name
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
@@ -101,12 +101,12 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <label htmlFor="email" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
                 Email address
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-slate-500" />
+                  <Mail className="h-5 w-5 text-slate-300" />
                 </div>
                 <input
                   id="email"
@@ -123,12 +123,12 @@ export default function Register() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <label htmlFor="password" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-slate-500" />
+                  <Lock className="h-5 w-5 text-slate-300" />
                 </div>
                 <input
                   id="password"

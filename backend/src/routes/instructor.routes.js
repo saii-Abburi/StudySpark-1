@@ -179,7 +179,7 @@ router.post(
           try {
             const cleanKey = (key) => key.replace(/"/g, "").trim();
 
-            const questionsToInsert = results
+            let questionsToInsert = results
               .map((row) => {
                 const cleanedRow = {};
                 Object.keys(row).forEach((key) => {
@@ -224,10 +224,11 @@ router.post(
               })
               .filter(Boolean);
 
-            if (req.body.limits) {
+            const limitsRaw = req.query.limits || req.body.limits;
+            if (limitsRaw) {
               try {
-                const limits = JSON.parse(req.body.limits);
-                const counts = { maths: 0, physics: 0, chemistry: 0, biology: 0 };
+                const limits = JSON.parse(limitsRaw);
+                const counts = { total: 0, easy: 0, medium: 0, hard: 0, maths: 0, physics: 0, chemistry: 0, biology: 0 };
                 
                 // Shuffle array so we don't always pick the first questions
                 for (let i = questionsToInsert.length - 1; i > 0; i--) {
@@ -237,17 +238,23 @@ router.post(
 
                 const parseLimit = (val) => (val !== '' && val !== null && val !== undefined) ? parseInt(val, 10) : null;
                 
+                const hasDiffLimit = ['easy', 'medium', 'hard'].some(d => parseLimit(limits[d]) !== null);
+                const hasSubLimit = ['maths', 'physics', 'chemistry', 'biology'].some(s => parseLimit(limits[s]) !== null);
+                
+                const getDiffLim = (d) => hasDiffLimit ? (parseLimit(limits[d]) || 0) : null;
+                const getSubLim = (s) => hasSubLimit ? (parseLimit(limits[s]) || 0) : null;
+                
                 const picked = [];
                 for (const q of questionsToInsert) {
                    const totalLim = parseLimit(limits.total);
                    if (totalLim !== null && counts.total >= totalLim) break;
 
                    const diff = q.difficulty?.toLowerCase() || 'medium';
-                   const diffLim = parseLimit(limits[diff]);
+                   const diffLim = getDiffLim(diff);
                    if (diffLim !== null && counts[diff] >= diffLim) continue;
 
                    const sub = q.subject?.toLowerCase();
-                   const subLim = sub ? parseLimit(limits[sub]) : null;
+                   const subLim = sub ? getSubLim(sub) : null;
                    if (subLim !== null && counts[sub] >= subLim) continue;
 
                    // It passed!

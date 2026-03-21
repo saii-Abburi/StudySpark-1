@@ -82,7 +82,7 @@ const StudentResults = () => {
         </Link>
         <div>
           <h1 className="text-3xl font-black text-white uppercase tracking-tight">Test Results</h1>
-          <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">{test?.title} • {test?.subject}</p>
+          <p className="text-slate-200 font-bold text-xs uppercase tracking-widest mt-1">{test?.title} • {test?.subject}</p>
         </div>
       </div>
 
@@ -92,11 +92,11 @@ const StudentResults = () => {
         
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-8">
           <div className="space-y-6">
-            <div className="inline-flex items-center px-3 py-1 bg-primary-500/10 border border-primary-500/30 text-primary-500 text-[10px] font-bold uppercase tracking-widest">
+            <div className="inline-flex items-center px-3 py-1 bg-primary-500/10 border border-primary-500/30 text-primary-500 text-xs font-bold uppercase tracking-widest">
               {status}
             </div>
-            <h2 className="text-5xl sm:text-7xl font-black text-white tracking-tighter">{score} <span className="text-base font-bold text-slate-500 uppercase tracking-widest">Points</span></h2>
-            <p className="text-slate-400 font-medium max-w-sm">
+            <h2 className="text-5xl sm:text-7xl font-black text-white tracking-tighter">{score} <span className="text-base font-bold text-slate-300 uppercase tracking-widest">Points</span></h2>
+            <p className="text-slate-200 font-medium max-w-sm">
               You submitted this test on {new Date(createdAt).toLocaleDateString()} at {new Date(createdAt).toLocaleTimeString()}.
             </p>
           </div>
@@ -105,12 +105,12 @@ const StudentResults = () => {
             <div className="bg-dark-900 border border-dark-700 p-6 flex flex-col items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-500 mb-3" />
               <span className="text-3xl font-black text-white">{correctCount}</span>
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">Correct</span>
+              <span className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">Correct</span>
             </div>
             <div className="bg-dark-900 border border-dark-700 p-6 flex flex-col items-center justify-center">
               <XCircle className="w-8 h-8 text-red-500 mb-3" />
               <span className="text-3xl font-black text-white">{incorrectCount}</span>
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2">Incorrect</span>
+              <span className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">Incorrect</span>
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ const StudentResults = () => {
                 className={`px-6 py-3 text-xs font-black uppercase tracking-widest transition-colors border ${
                   activeSubject === sub
                     ? 'bg-primary-500/10 text-primary-500 border-primary-500/50 border-b-primary-500 shadow-[inset_0_-2px_0_theme(colors.primary.500)]'
-                    : 'bg-dark-900 text-slate-500 hover:bg-dark-800 border-dark-700 hover:text-white'
+                    : 'bg-dark-900 text-slate-300 hover:bg-dark-800 border-dark-700 hover:text-white'
                 }`}
               >
                 {sub}
@@ -142,7 +142,7 @@ const StudentResults = () => {
         )}
         
         {answers.length === 0 ? (
-          <div className="bg-dark-800 p-8 border border-dark-700 text-center text-slate-400 font-medium">
+          <div className="bg-dark-800 p-8 border border-dark-700 text-center text-slate-200 font-medium">
             No answers were submitted for this test.
           </div>
         ) : (
@@ -161,13 +161,13 @@ const StudentResults = () => {
                     : 'border-l-red-500'
                 }`}>
                   <div className="flex items-start justify-between mb-6">
-                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-dark-900 border border-dark-700 px-3 py-1">Question {index + 1}</span>
+                     <span className="text-xs font-bold text-slate-300 uppercase tracking-widest bg-dark-900 border border-dark-700 px-3 py-1">Question {index + 1}</span>
                      {isCorrect ? (
-                       <span className="flex items-center text-green-500 bg-green-500/10 border border-green-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                       <span className="flex items-center text-green-500 bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs font-bold uppercase tracking-widest">
                          <CheckCircle className="w-3 h-3 mr-2" /> +{q.marks}
                        </span>
                      ) : (
-                       <span className="flex items-center text-red-500 bg-red-500/10 border border-red-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                       <span className="flex items-center text-red-500 bg-red-500/10 border border-red-500/20 px-3 py-1 text-xs font-bold uppercase tracking-widest">
                          <XCircle className="w-3 h-3 mr-2" /> -{q.negativeMarks}
                        </span>
                      )}
@@ -196,7 +196,7 @@ const StudentResults = () => {
                             border: '1px solid #374151',
                           }));
                       }}
-                      className="flex items-center space-x-2 px-4 py-2 bg-dark-900 border border-dark-700 hover:border-primary-500/50 hover:bg-primary-500/10 text-slate-400 hover:text-primary-500 transition-colors text-xs font-bold uppercase tracking-widest"
+                      className="flex items-center space-x-2 px-4 py-2 bg-dark-900 border border-dark-700 hover:border-primary-500/50 hover:bg-primary-500/10 text-slate-200 hover:text-primary-500 transition-colors text-xs font-bold uppercase tracking-widest"
                     >
                       <BookMarked className="w-4 h-4" />
                       <span>Bookmark</span>
@@ -222,7 +222,7 @@ const StudentResults = () => {
                             }));
                         }
                       }}
-                       className="flex items-center space-x-2 px-4 py-2 bg-dark-900 border border-dark-700 hover:border-amber-500/50 hover:bg-amber-500/10 text-slate-400 hover:text-amber-500 transition-colors text-xs font-bold uppercase tracking-widest"
+                       className="flex items-center space-x-2 px-4 py-2 bg-dark-900 border border-dark-700 hover:border-amber-500/50 hover:bg-amber-500/10 text-slate-200 hover:text-amber-500 transition-colors text-xs font-bold uppercase tracking-widest"
                     >
                       <AlertTriangle className="w-4 h-4" />
                       <span>Report</span>
@@ -273,7 +273,7 @@ const StudentResults = () => {
                       >
                         <span className="text-primary-500">Explanation</span>
                         <Plus 
-                          className={`w-5 h-5 text-slate-400 transition-transform duration-300 ease-in-out ${
+                          className={`w-5 h-5 text-slate-200 transition-transform duration-300 ease-in-out ${
                             expandedExplanations.has(q._id) ? 'rotate-[225deg] text-primary-500' : 'rotate-0'
                           }`} 
                         />

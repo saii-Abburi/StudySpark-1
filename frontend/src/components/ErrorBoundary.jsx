@@ -32,13 +32,13 @@ class ErrorBoundary extends React.Component {
               </div>
               <div>
                 <h1 className="text-2xl font-black uppercase tracking-tight text-white mb-1">Application Error</h1>
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">A component crashed while rendering</p>
+                <p className="text-slate-200 text-xs font-bold uppercase tracking-widest">A component crashed while rendering</p>
               </div>
             </div>
             
             <div className="bg-dark-900 border border-dark-700 p-4 mb-8 overflow-auto max-h-64 relative z-10 text-left w-full">
                <p className="text-red-400 font-mono text-sm font-bold mb-2">{this.state.error && this.state.error.toString()}</p>
-               <pre className="text-slate-500 font-mono text-xs whitespace-pre-wrap">{this.state.errorInfo && this.state.errorInfo.componentStack}</pre>
+               <pre className="text-slate-300 font-mono text-xs whitespace-pre-wrap">{this.state.errorInfo && this.state.errorInfo.componentStack}</pre>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 relative z-10">

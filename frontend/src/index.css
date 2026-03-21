@@ -16,7 +16,7 @@ body {
 
 /* Base Headings */
 h1, h2, h3, h4, h5, h6 {
-  @apply text-gray-900 dark:text-white font-bold tracking-tight;
+  @apply text-white font-bold tracking-tight;
 }
 
 /* Custom scrollbar */

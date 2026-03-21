@@ -104,7 +104,7 @@ const InstructorResources = () => {
             <span className="w-8 h-1 bg-primary-500 mr-3"></span>
             Study Materials
           </h1>
-          <p className="text-slate-400 font-medium tracking-wide mt-2">Manage and upload PDF resources for your students.</p>
+          <p className="text-slate-200 font-medium tracking-wide mt-2">Manage and upload PDF resources for your students.</p>
         </div>
         <button 
           onClick={() => setShowUploadModal(true)}
@@ -124,7 +124,7 @@ const InstructorResources = () => {
 
       {/* Search Bar */}
       <div className="bg-dark-800 p-4 border border-dark-700 flex items-center">
-        <Search className="w-5 h-5 text-slate-500 mr-3" />
+        <Search className="w-5 h-5 text-slate-300 mr-3" />
         <input 
           type="text"
           placeholder="SEARCH BY TITLE OR SUBJECT..."
@@ -137,14 +137,14 @@ const InstructorResources = () => {
       {/* Resources List */}
       <div className="bg-dark-800 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 border-l-4 border-l-primary-500 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-slate-500 font-bold uppercase tracking-widest text-sm">Loading resources...</div>
+          <div className="p-8 text-center text-slate-300 font-bold uppercase tracking-widest text-sm">Loading resources...</div>
         ) : filteredResources.length === 0 ? (
           <div className="p-16 text-center flex flex-col items-center">
             <div className="w-20 h-20 bg-dark-900 border border-dark-700 flex items-center justify-center mb-6">
               <FileText className="w-10 h-10 text-slate-600" />
             </div>
             <h3 className="text-xl font-black text-white mb-2 uppercase tracking-wide">No resources found</h3>
-            <p className="text-slate-400 max-w-sm mb-8 font-medium">You haven't uploaded any study materials yet, or none match your search.</p>
+            <p className="text-slate-200 max-w-sm mb-8 font-medium">You haven't uploaded any study materials yet, or none match your search.</p>
             <button 
               onClick={() => setShowUploadModal(true)}
               className="px-6 py-3 bg-dark-900 hover:bg-dark-700 text-white border border-dark-700 font-bold text-xs uppercase tracking-widest transition-colors"
@@ -154,8 +154,8 @@ const InstructorResources = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-400">
-              <thead className="text-[10px] font-bold uppercase tracking-widest bg-dark-900 border-b border-dark-700 text-slate-500">
+            <table className="w-full text-left text-sm text-slate-200">
+              <thead className="text-xs font-bold uppercase tracking-widest bg-dark-900 border-b border-dark-700 text-slate-300">
                 <tr>
                   <th className="px-6 py-4">Resource Title</th>
                   <th className="px-6 py-4">Subject & Chapter</th>
@@ -178,23 +178,23 @@ const InstructorResources = () => {
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="font-bold uppercase tracking-widest text-xs text-slate-300">{resource.subject}</span>
-                        {resource.chapter && <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{resource.chapter}</span>}
+                        {resource.chapter && <span className="text-xs font-bold text-slate-300 uppercase tracking-widest mt-1">{resource.chapter}</span>}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest border ${
+                      <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest border ${
                         resource.isPremium ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-green-500/10 text-green-500 border-green-500/20'
                       }`}>
                         {resource.isPremium ? 'Premium' : 'Free'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    <td className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-300">
                       {new Date(resource.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button 
                         onClick={() => handleDelete(resource._id)}
-                        className="p-3 bg-dark-900 text-slate-500 hover:text-red-500 hover:bg-red-500/10 border border-dark-700 hover:border-red-500/30 transition-colors"
+                        className="p-3 bg-dark-900 text-slate-300 hover:text-red-500 hover:bg-red-500/10 border border-dark-700 hover:border-red-500/30 transition-colors"
                         title="Delete Resource"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -218,7 +218,7 @@ const InstructorResources = () => {
                 <UploadCloud className="w-6 h-6 mr-3 text-primary-500" />
                 Upload Resource
               </h2>
-              <button onClick={() => setShowUploadModal(false)} className="text-slate-500 hover:text-white transition-colors">
+              <button onClick={() => setShowUploadModal(false)} className="text-slate-300 hover:text-white transition-colors">
                 <span className="text-2xl leading-none">&times;</span>
               </button>
             </div>
@@ -227,7 +227,7 @@ const InstructorResources = () => {
               <form id="uploadResourceForm" onSubmit={handleUploadSubmit} className="space-y-6">
                 
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Resource Title *</label>
+                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Resource Title *</label>
                   <input 
                     type="text" 
                     required
@@ -240,7 +240,7 @@ const InstructorResources = () => {
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Subject *</label>
+                    <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Subject *</label>
                     <input 
                       type="text" 
                       required
@@ -251,7 +251,7 @@ const InstructorResources = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Chapter</label>
+                    <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Chapter</label>
                     <input 
                       type="text" 
                       value={formData.chapter}
@@ -263,7 +263,7 @@ const InstructorResources = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Access Level</label>
+                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Access Level</label>
                   <select
                     value={formData.isPremium}
                     onChange={(e) => setFormData({...formData, isPremium: e.target.value})}
@@ -275,7 +275,7 @@ const InstructorResources = () => {
                 </div>
 
                 <div className="pt-4">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">PDF File *</label>
+                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">PDF File *</label>
                   <div className="border border-dashed border-dark-600 p-8 flex flex-col items-center justify-center bg-dark-900 hover:bg-dark-800 transition-colors">
                     <input 
                       type="file" 
@@ -291,7 +291,7 @@ const InstructorResources = () => {
                         <UploadCloud className="w-8 h-8" />
                       </div>
                       <span className="text-sm font-bold text-primary-500 hover:text-primary-400 mb-2 uppercase tracking-widest">Click to browse</span>
-                      <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">Only .pdf files are supported (Max 10MB)</span>
+                      <span className="text-xs font-medium text-slate-300 uppercase tracking-widest">Only .pdf files are supported (Max 10MB)</span>
                     </label>
                     {selectedFile && (
                       <div className="mt-6 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-500 text-xs font-bold uppercase tracking-widest flex items-center">
@@ -309,7 +309,7 @@ const InstructorResources = () => {
               <button 
                 type="button"
                 onClick={() => setShowUploadModal(false)}
-                className="px-6 py-3 text-slate-400 hover:text-white bg-dark-800 hover:bg-dark-700 border border-dark-700 font-bold text-xs uppercase tracking-widest transition-colors"
+                className="px-6 py-3 text-slate-200 hover:text-white bg-dark-800 hover:bg-dark-700 border border-dark-700 font-bold text-xs uppercase tracking-widest transition-colors"
               >
                 Cancel
               </button>

@@ -56,7 +56,7 @@ const StudentResources = () => {
             <span className="w-8 h-1 bg-primary-500 mr-3"></span>
             Study Materials
           </h1>
-          <p className="text-slate-400 font-medium tracking-wide mt-2">Access PDFs, lecture notes, and formula sheets.</p>
+          <p className="text-slate-200 font-medium tracking-wide mt-2">Access PDFs, lecture notes, and formula sheets.</p>
         </div>
       </div>
 
@@ -82,14 +82,14 @@ const StudentResources = () => {
       {/* Resources List */}
       <div className="bg-dark-800 border border-dark-700">
         {loading ? (
-          <div className="p-8 text-center text-slate-500 font-bold uppercase tracking-widest text-xs">Loading study materials...</div>
+          <div className="p-8 text-center text-slate-300 font-bold uppercase tracking-widest text-xs">Loading study materials...</div>
         ) : filteredResources.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center">
             <div className="w-16 h-16 bg-dark-900 border border-dark-700 flex items-center justify-center mb-6">
               <FileText className="w-8 h-8 text-slate-600" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide">No materials available</h3>
-            <p className="text-slate-400 font-medium max-w-sm">There are currently no study materials uploaded for you to view.</p>
+            <p className="text-slate-200 font-medium max-w-sm">There are currently no study materials uploaded for you to view.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
@@ -103,20 +103,20 @@ const StudentResources = () => {
                     {resource.isPremium ? <Lock className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
                   </div>
                   {resource.isPremium && (
-                    <span className="px-3 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold uppercase tracking-widest flex items-center">
+                    <span className="px-3 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 text-xs font-bold uppercase tracking-widest flex items-center">
                       Premium
                     </span>
                   )}
                 </div>
 
                 <div className="relative z-10 w-full flex-grow mb-6">
-                  <span className="inline-block px-2 py-1 bg-dark-800 border border-dark-700 text-slate-300 text-[10px] font-bold uppercase tracking-widest mb-3 block">
+                  <span className="inline-block px-2 py-1 bg-dark-800 border border-dark-700 text-slate-300 text-xs font-bold uppercase tracking-widest mb-3 block">
                     {resource.subject} {resource.chapter && `• ${resource.chapter}`}
                   </span>
                   <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 leading-snug">
                     {resource.title}
                   </h3>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+                  <p className="text-xs text-slate-300 font-bold uppercase tracking-widest">
                     Uploaded: {new Date(resource.createdAt).toLocaleDateString()}
                   </p>
                 </div>

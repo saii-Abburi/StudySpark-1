@@ -71,23 +71,22 @@ const InstructorOverview = () => {
     if (!csvFile) return customToast.error('Please select a file to upload.');
 
     setUploading(true);
+    setUploading(true);
     const formData = new FormData();
     formData.append('file', csvFile);
-    if (uploadType === 'questions') {
-      formData.append('limits', JSON.stringify(csvLimits));
-    }
 
     try {
       if (uploadType === 'flashcards') {
         const res = await instructorService.uploadFlashcardsCSV(formData);
-        customToast.error(`Successfully uploaded ${res.data.count} flashcards.`);
+        customToast.success(`Successfully uploaded ${res.data.count} flashcards.`);
       } else {
         if (!selectedQuizId) {
            setUploading(false);
            return customToast.error('Please select a quiz to upload questions for.');
         }
-        const res = await instructorService.uploadQuestionsCSV(selectedQuizId, formData);
-        customToast.error(`Successfully uploaded ${res.data.count} questions.`);
+        const encodedLimits = encodeURIComponent(JSON.stringify(csvLimits));
+        const res = await instructorService.uploadQuestionsCSV(selectedQuizId, formData, encodedLimits);
+        customToast.success(`Successfully uploaded ${res.data.count} questions.`);
         fetchQuizzes(); // Refresh to get updated marks/question count
       }
       setCsvFile(null);
@@ -113,7 +112,7 @@ const InstructorOverview = () => {
           <span className="w-8 h-1 bg-primary-500 mr-3"></span>
           Instructor Dashboard
         </h1>
-        <p className="text-slate-400 font-medium tracking-wide mt-2">Manage your tests, questions, and students' educational content.</p>
+        <p className="text-slate-200 font-medium tracking-wide mt-2">Manage your tests, questions, and students' educational content.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -144,7 +143,7 @@ const InstructorOverview = () => {
             </h3>
             <form onSubmit={handleFileUpload} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Upload Type</label>
+                <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Upload Type</label>
                 <select 
                   value={uploadType} 
                   onChange={(e) => setUploadType(e.target.value)}
@@ -158,7 +157,7 @@ const InstructorOverview = () => {
               {uploadType === 'questions' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Target Quiz</label>
+                    <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Target Quiz</label>
                     <select 
                       value={selectedQuizId} 
                       onChange={(e) => setSelectedQuizId(e.target.value)}
@@ -175,8 +174,8 @@ const InstructorOverview = () => {
                   {selectedQuizId && (
                     <div className="bg-dark-900 p-5 border border-dark-700 space-y-6">
                        <div>
-                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Total Limit</label>
-                         <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">Maximum questions to pull from the file.</p>
+                         <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Total Limit</label>
+                         <p className="text-xs text-slate-300 uppercase tracking-widest font-bold mb-2">Maximum questions to pull from the file.</p>
                          <input 
                            type="number"
                            min="0"
@@ -188,11 +187,11 @@ const InstructorOverview = () => {
                        </div>
 
                        <div>
-                         <label className="block text-[10px] font-bold text-slate-400 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Difficulty Breakdown</label>
+                         <label className="block text-xs font-bold text-slate-200 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Difficulty Breakdown</label>
                          <div className="grid grid-cols-3 gap-3">
                            {['easy', 'medium', 'hard'].map(diff => (
                              <div key={diff}>
-                               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{diff}</label>
+                               <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-1">{diff}</label>
                                <input 
                                  type="number"
                                  min="0"
@@ -207,11 +206,11 @@ const InstructorOverview = () => {
                        </div>
 
                        <div>
-                         <label className="block text-[10px] font-bold text-slate-400 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Subject Breakdown</label>
+                         <label className="block text-xs font-bold text-slate-200 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Subject Breakdown</label>
                          <div className="grid grid-cols-2 gap-3">
                            {['maths', 'physics', 'chemistry', 'biology'].map(sub => (
                              <div key={sub}>
-                               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{sub}</label>
+                               <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-1">{sub}</label>
                                <input 
                                  type="number"
                                  min="0"
@@ -230,12 +229,12 @@ const InstructorOverview = () => {
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">CSV File</label>
+                <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">CSV File</label>
                 <input 
                   type="file" 
                   accept=".csv"
                   onChange={(e) => setCsvFile(e.target.files[0])}
-                  className="w-full text-sm text-slate-400 file:mr-4 file:py-3 file:px-6 file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-dark-900 file:text-primary-500 hover:file:bg-dark-700 file:border file:border-dark-700 cursor-pointer focus:outline-none transition-colors"
+                  className="w-full text-sm text-slate-200 file:mr-4 file:py-3 file:px-6 file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-dark-900 file:text-primary-500 hover:file:bg-dark-700 file:border file:border-dark-700 cursor-pointer focus:outline-none transition-colors"
                   required
                 />
               </div>
@@ -271,7 +270,7 @@ const InstructorOverview = () => {
               
               <form onSubmit={handleCreateQuiz} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Title</label>
+                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Title</label>
                   <input 
                     type="text" 
                     value={newQuiz.title}
@@ -282,7 +281,7 @@ const InstructorOverview = () => {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Test Type</label>
+                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-3">Test Type</label>
                   <div className="flex bg-dark-900 border border-dark-700 p-1">
                     <button
                       type="button"
@@ -290,7 +289,7 @@ const InstructorOverview = () => {
                       className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-colors ${
                         newQuiz.testType === 'chapter-wise' 
                         ? 'bg-primary-500 text-white' 
-                        : 'text-slate-500 hover:text-slate-300'
+                        : 'text-slate-300 hover:text-slate-300'
                       }`}
                     >
                       Chapter-wise Test
@@ -301,7 +300,7 @@ const InstructorOverview = () => {
                       className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-colors ${
                         newQuiz.testType === 'mock' 
                         ? 'bg-primary-500 text-white' 
-                        : 'text-slate-500 hover:text-slate-300'
+                        : 'text-slate-300 hover:text-slate-300'
                       }`}
                     >
                       Mock Test
@@ -311,7 +310,7 @@ const InstructorOverview = () => {
 
                 {newQuiz.testType === 'chapter-wise' ? (
                   <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Subject</label>
+                    <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-3">Subject</label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                       {['physics', 'chemistry', 'biology', 'maths'].map(sub => (
                         <button
@@ -321,7 +320,7 @@ const InstructorOverview = () => {
                           className={`py-3 px-4 text-xs font-bold uppercase tracking-widest border transition-all ${
                             newQuiz.subject === sub
                             ? 'bg-dark-800 border-primary-500 text-primary-500'
-                            : 'bg-dark-900 border-dark-700 text-slate-500 hover:border-slate-500 hover:text-white'
+                            : 'bg-dark-900 border-dark-700 text-slate-300 hover:border-slate-500 hover:text-white'
                           }`}
                         >
                           {sub}
@@ -331,7 +330,7 @@ const InstructorOverview = () => {
                   </div>
                 ) : (
                   <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Mock Category</label>
+                    <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-3">Mock Category</label>
                     <div className="grid grid-cols-2 gap-2">
                       {['engineering', 'medical'].map(cat => (
                         <button
@@ -341,11 +340,11 @@ const InstructorOverview = () => {
                           className={`py-3 px-4 text-xs font-bold uppercase tracking-widest border transition-all flex flex-col items-center justify-center gap-1 ${
                             newQuiz.category === cat
                             ? 'bg-dark-800 border-primary-500 text-primary-500'
-                            : 'bg-dark-900 border-dark-700 text-slate-500 hover:border-slate-500 hover:text-white'
+                            : 'bg-dark-900 border-dark-700 text-slate-300 hover:border-slate-500 hover:text-white'
                           }`}
                         >
                           <span>{cat} Mock</span>
-                          <span className={`text-[10px] ${newQuiz.category === cat ? 'text-primary-500/70' : 'text-slate-600'}`}>
+                          <span className={`text-xs ${newQuiz.category === cat ? 'text-primary-500/70' : 'text-slate-600'}`}>
                             {cat === 'engineering' ? 'Maths/Phy/Chem' : 'Bio/Phy/Chem'}
                           </span>
                         </button>
@@ -355,7 +354,7 @@ const InstructorOverview = () => {
                 )}
                 
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Difficulty</label>
+                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Difficulty</label>
                   <select 
                     value={newQuiz.difficulty}
                     onChange={(e) => setNewQuiz({...newQuiz, difficulty: e.target.value})}
@@ -368,7 +367,7 @@ const InstructorOverview = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Duration (Mins)</label>
+                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Duration (Mins)</label>
                   <input 
                     type="number" 
                     value={newQuiz.duration}
@@ -393,7 +392,7 @@ const InstructorOverview = () => {
             <div className="bg-dark-800 p-12 text-center border border-dark-700 shadow-sm mt-8">
               <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-6" />
               <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide">No quizzes yet</h3>
-              <p className="text-slate-400 font-medium">Click "New Quiz" to create your first assessment.</p>
+              <p className="text-slate-200 font-medium">Click "New Quiz" to create your first assessment.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6">
@@ -401,7 +400,7 @@ const InstructorOverview = () => {
                 <div key={quiz._id} className="bg-dark-800 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 border-l-4 border-l-primary-500 p-6 flex flex-col sm:flex-row sm:items-center justify-between group hover:bg-dark-800/80 transition-colors">
                   <div className="mb-6 sm:mb-0">
                     <div className="flex items-center space-x-4 mb-3">
-                      <span className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-widest ${
+                      <span className={`px-3 py-1 border text-xs font-bold uppercase tracking-widest ${
                         quiz.testType === 'mock' 
                           ? (quiz.category === 'engineering' ? 'text-blue-500 bg-blue-500/10 border-blue-500/20' : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20')
                           : quiz.subject === 'maths' ? 'text-red-500 bg-red-500/10 border-red-500/20'
@@ -414,12 +413,12 @@ const InstructorOverview = () => {
                           ? (quiz.category === 'engineering' ? '80 Maths • 40 Physics • 40 Chemistry' : '80 Biology • 40 Physics • 40 Chemistry') 
                           : quiz.subject}
                       </span>
-                      <span className="px-3 py-1 bg-dark-900 border border-dark-700 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                      <span className="px-3 py-1 bg-dark-900 border border-dark-700 text-slate-200 text-xs font-bold uppercase tracking-widest">
                         {quiz.difficulty || 'mixed'}
                       </span>
                       <h3 className="text-xl font-bold text-white leading-snug">{quiz.title}</h3>
                     </div>
-                    <div className="flex items-center text-xs font-bold uppercase tracking-widest text-slate-500 space-x-6 ml-1">
+                    <div className="flex items-center text-xs font-bold uppercase tracking-widest text-slate-300 space-x-6 ml-1">
                       <span className="flex items-center"><Activity className="w-3 h-3 mr-2" />{quiz.duration} mins</span>
                       <span className="w-1 h-3 bg-dark-700"></span>
                       <span className="flex items-center text-primary-500">Total Marks: {quiz.totalMarks || 0}</span>
@@ -429,14 +428,14 @@ const InstructorOverview = () => {
                   <div className="flex items-center space-x-3">
                     <Link 
                       to={`/dashboard/edit-test/${quiz._id}`} 
-                      className="p-3 bg-dark-900 text-slate-400 hover:text-white hover:bg-primary-500/20 border border-dark-700 hover:border-primary-500/50 transition-colors"
+                      className="p-3 bg-dark-900 text-slate-200 hover:text-white hover:bg-primary-500/20 border border-dark-700 hover:border-primary-500/50 transition-colors"
                       title="Edit Questions"
                     >
                       <Edit3 className="w-5 h-5" />
                     </Link>
                     <button 
                       onClick={() => handleDeleteQuiz(quiz._id)}
-                      className="p-3 bg-dark-900 text-slate-500 hover:text-red-500 hover:bg-red-500/10 border border-dark-700 hover:border-red-500/30 transition-colors"
+                      className="p-3 bg-dark-900 text-slate-300 hover:text-red-500 hover:bg-red-500/10 border border-dark-700 hover:border-red-500/30 transition-colors"
                       title="Delete Quiz"
                     >
                       <Trash2 className="w-5 h-5" />

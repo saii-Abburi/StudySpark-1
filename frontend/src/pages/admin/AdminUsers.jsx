@@ -65,11 +65,11 @@ const AdminUsers = () => {
             <span className="w-8 h-1 bg-primary-500 mr-3"></span>
             User Management
           </h1>
-          <p className="text-slate-400 mt-2 font-medium tracking-wide">Manage roles, blocks, and platform access.</p>
+          <p className="text-slate-200 mt-2 font-medium tracking-wide">Manage roles, blocks, and platform access.</p>
         </div>
         
         <div className="relative max-w-xs w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
           <input 
             type="text" 
             placeholder="Search users..." 
@@ -84,7 +84,7 @@ const AdminUsers = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-dark-900 border-b border-dark-700 text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <tr className="bg-dark-900 border-b border-dark-700 text-xs font-bold text-slate-200 uppercase tracking-widest">
                 <th className="p-4">User</th>
                 <th className="p-4">Role</th>
                 <th className="p-4">Status</th>
@@ -101,7 +101,7 @@ const AdminUsers = () => {
                       </div>
                       <div>
                         <div className="text-white font-bold">{usr.name}</div>
-                        <div className="text-slate-500 text-xs mt-0.5">{usr.email}</div>
+                        <div className="text-slate-300 text-xs mt-0.5">{usr.email}</div>
                       </div>
                     </div>
                   </td>
@@ -117,7 +117,7 @@ const AdminUsers = () => {
                     </select>
                   </td>
                   <td className="p-4">
-                    <span className={`inline-flex items-center px-2 py-1 text-[10px] font-bold uppercase tracking-widest border ${
+                    <span className={`inline-flex items-center px-2 py-1 text-xs font-bold uppercase tracking-widest border ${
                       usr.isBlocked 
                         ? 'bg-red-500/10 text-red-500 border-red-500/20' 
                         : 'bg-green-500/10 text-green-500 border-green-500/20'
@@ -146,7 +146,7 @@ const AdminUsers = () => {
               
               {filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="p-8 text-center text-slate-500 font-medium">
+                  <td colSpan="4" className="p-8 text-center text-slate-300 font-medium">
                     No users found matching your search.
                   </td>
                 </tr>

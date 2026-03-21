@@ -78,7 +78,7 @@ const StudentFlashcards = () => {
             <span className="w-8 h-1 bg-primary-500 mr-3"></span>
             Flashcards
           </h1>
-          <p className="text-slate-400 font-medium tracking-wide mt-2">Quick revision cards for active recall.</p>
+          <p className="text-slate-200 font-medium tracking-wide mt-2">Quick revision cards for active recall.</p>
         </div>
 
         {/* Filters */}
@@ -116,12 +116,12 @@ const StudentFlashcards = () => {
         <div className="bg-dark-800 p-12 text-center border border-dark-700 shadow-sm mt-8">
           <Layers className="w-12 h-12 text-slate-600 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide">No flashcards found</h3>
-          <p className="text-slate-400 font-medium">Try adjusting your filters or check back later.</p>
+          <p className="text-slate-200 font-medium">Try adjusting your filters or check back later.</p>
         </div>
       ) : (
         <div className="flex flex-col items-center">
           {/* Progress */}
-          <div className="text-sm font-bold text-slate-500 mb-6 font-mono tracking-widest bg-dark-800 px-4 py-2 border border-dark-700">
+          <div className="text-sm font-bold text-slate-300 mb-6 font-mono tracking-widest bg-dark-800 px-4 py-2 border border-dark-700">
              {currentIndex + 1} / {flashcards.length}
           </div>
 
@@ -134,14 +134,14 @@ const StudentFlashcards = () => {
                 
                 {/* Decorative Top Left */}
                 <div className="absolute top-6 left-6">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <span className="text-xs font-bold text-slate-200 uppercase tracking-widest">
                     {currentCard.subject}
                   </span>
                 </div>
 
                 {/* Decorative Top Right */}
                 <div className="absolute top-6 right-6 flex items-center space-x-2">
-                  <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest border ${
+                  <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest border ${
                     currentCard.difficulty === 'easy' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
                     currentCard.difficulty === 'medium' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
                     'bg-red-500/10 text-red-500 border-red-500/20'
@@ -156,7 +156,7 @@ const StudentFlashcards = () => {
                 </h2>
                 
                 {currentCard.chapter && (
-                  <p className="absolute bottom-6 text-xs text-slate-500 font-bold tracking-widest uppercase">
+                  <p className="absolute bottom-6 text-xs text-slate-300 font-bold tracking-widest uppercase">
                     Chapter: {currentCard.chapter}
                   </p>
                 )}

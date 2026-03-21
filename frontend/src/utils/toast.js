@@ -10,9 +10,9 @@ export const customToast = {
     return toast({
       message,
       iconType: 'success',
-      background: '#1f2937', // bg-dark-800
-      color: '#f97316', // text-primary-500
-      border: '1px solid #374151', // border-dark-700
+      background: 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)',
+      color: '#4ade80', 
+      border: '1px solid #059669',
       duration: 3500,
     });
   },
@@ -21,9 +21,9 @@ export const customToast = {
     return toast({
       message,
       iconType: 'error',
-      background: '#1f2937', // bg-dark-800
-      color: '#f87171', // text-red-400
-      border: '1px solid #374151', // border-dark-700
+      background: 'linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%)',
+      color: '#fca5a5', 
+      border: '1px solid #dc2626',
       duration: 4000,
     });
   },

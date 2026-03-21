@@ -49,7 +49,7 @@ export default function Login() {
         <h2 className="mt-8 text-center text-4xl font-black text-white tracking-tight leading-none">
           Welcome back
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-400 font-medium">
+        <p className="mt-2 text-center text-sm text-slate-200 font-medium">
           Or{' '}
           <Link to="/register" className="font-bold text-primary-500 hover:text-primary-400 transition-colors uppercase tracking-wider text-xs">
             create a new account
@@ -76,12 +76,12 @@ export default function Login() {
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <label htmlFor="email" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
                 Email address
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-slate-500" />
+                  <Mail className="h-5 w-5 text-slate-300" />
                 </div>
                 <input
                   id="email"
@@ -98,12 +98,12 @@ export default function Login() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <label htmlFor="password" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-slate-500" />
+                  <Lock className="h-5 w-5 text-slate-300" />
                 </div>
                 <input
                   id="password"
@@ -127,7 +127,7 @@ export default function Login() {
                   type="checkbox"
                   className="h-4 w-4 text-primary-500 focus:ring-primary-500 border-dark-600 bg-dark-900 rounded-sm"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-400">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-200">
                   Remember me
                 </label>
               </div>

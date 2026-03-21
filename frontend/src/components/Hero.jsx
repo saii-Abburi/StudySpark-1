@@ -129,7 +129,7 @@ const Hero = () => {
               <CheckCircle size={16} className="text-accent" />
               <span className="text-xs text-gray-500 font-medium">95% Success Rate</span>
             </div>
-            <p className="text-[10px] text-gray-500 font-medium">Proven Results</p>
+            <p className="text-xs text-gray-500 font-medium">Proven Results</p>
           </motion.div>
         </motion.div>
       </div>

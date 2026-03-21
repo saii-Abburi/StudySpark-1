@@ -50,7 +50,7 @@ const StudentBookmarks = () => {
             <span className="w-8 h-1 bg-primary-500 mr-3"></span>
             My Bookmarks
           </h1>
-          <p className="text-slate-400 font-medium tracking-wide mt-2">Review your saved questions and flashcards.</p>
+          <p className="text-slate-200 font-medium tracking-wide mt-2">Review your saved questions and flashcards.</p>
         </div>
 
         {/* Filters */}
@@ -62,7 +62,7 @@ const StudentBookmarks = () => {
               className={`px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors ${
                 filter === type
                   ? 'bg-dark-800 text-white border border-dark-600'
-                  : 'text-slate-500 hover:text-white hover:bg-dark-800/50'
+                  : 'text-slate-300 hover:text-white hover:bg-dark-800/50'
               }`}
             >
               {type}s
@@ -77,7 +77,7 @@ const StudentBookmarks = () => {
         <div className="bg-dark-800 p-12 text-center border border-dark-700 shadow-sm mt-8">
           <BookMarked className="w-12 h-12 text-slate-600 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide">No bookmarks found</h3>
-          <p className="text-slate-400 font-medium">
+          <p className="text-slate-200 font-medium">
             {filter !== 'All' ? `You haven't bookmarked any ${filter.toLowerCase()}s.` : "Save items while studying to review them here later."}
           </p>
         </div>
@@ -101,7 +101,7 @@ const StudentBookmarks = () => {
                   </div>
                   <button 
                     onClick={() => handleRemoveBookmark(bookmark._id)}
-                    className="p-2 text-slate-500 hover:text-red-500 hover:bg-dark-900 border border-transparent hover:border-red-500/20 transition-colors"
+                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-dark-900 border border-transparent hover:border-red-500/20 transition-colors"
                     title="Remove Bookmark"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -113,7 +113,7 @@ const StudentBookmarks = () => {
                   {item ? (
                     <>
                       <div className="mb-4">
-                         <span className="inline-block px-2 py-1 bg-dark-900 border border-dark-700 text-slate-300 text-[10px] font-bold uppercase tracking-widest">
+                         <span className="inline-block px-2 py-1 bg-dark-900 border border-dark-700 text-slate-300 text-xs font-bold uppercase tracking-widest">
                            {item.subject}
                          </span>
                       </div>
@@ -122,7 +122,7 @@ const StudentBookmarks = () => {
                       </p>
                     </>
                   ) : (
-                    <p className="text-slate-500 italic font-medium">This item is no longer available.</p>
+                    <p className="text-slate-300 italic font-medium">This item is no longer available.</p>
                   )}
                 </div>
 

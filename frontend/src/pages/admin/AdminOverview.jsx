@@ -60,7 +60,7 @@ const AdminOverview = () => {
           <span className="w-8 h-1 bg-primary-500 mr-3"></span>
           Admin Dashboard
         </h1>
-        <p className="text-slate-400 font-medium tracking-wide mt-2">Platform overview and statistics.</p>
+        <p className="text-slate-200 font-medium tracking-wide mt-2">Platform overview and statistics.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -73,7 +73,7 @@ const AdminOverview = () => {
               <Activity className="w-4 h-4 text-slate-600" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.title}</p>
+              <p className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-1">{stat.title}</p>
               <h3 className="text-3xl font-black text-white">{stat.value}</h3>
             </div>
           </div>
@@ -91,19 +91,19 @@ const AdminOverview = () => {
           
           <div className="space-y-4 relative z-10">
             {recentAttempts.length === 0 ? (
-              <p className="text-slate-400 font-medium">No recent attempts.</p>
+              <p className="text-slate-200 font-medium">No recent attempts.</p>
             ) : (
               recentAttempts.map((attempt) => (
                 <div key={attempt._id} className="flex flex-col sm:flex-row justify-between sm:items-center p-5 bg-dark-900 border border-dark-700 hover:bg-dark-800 transition-colors gap-3">
                   <div>
                     <p className="font-bold text-white text-sm">
-                      {attempt.user?.firstName || 'Student'} <span className="text-slate-500 font-medium px-1">attempted</span> {attempt.test?.title}
+                      {attempt.user?.firstName || 'Student'} <span className="text-slate-300 font-medium px-1">attempted</span> {attempt.test?.title}
                     </p>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-2">
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-300 mt-2">
                       {new Date(attempt.createdAt).toLocaleString()}
                     </p>
                   </div>
-                  <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest border self-start sm:self-auto shrink-0 ${
+                  <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest border self-start sm:self-auto shrink-0 ${
                     attempt.status === 'submitted' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
                   }`}>
                     {attempt.status}
@@ -126,7 +126,7 @@ const AdminOverview = () => {
           
           <div className="space-y-4 relative z-10">
             {onlineUsers.length === 0 ? (
-              <p className="text-slate-400 font-medium">No users currently online.</p>
+              <p className="text-slate-200 font-medium">No users currently online.</p>
             ) : (
               onlineUsers.map((user) => (
                 <div key={user._id} className="flex justify-between items-center p-5 bg-dark-900 border border-dark-700 hover:bg-dark-800 transition-colors">
@@ -138,10 +138,10 @@ const AdminOverview = () => {
                       <p className="font-bold text-white text-sm">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-xs text-slate-400">{user.email}</p>
+                      <p className="text-xs text-slate-200">{user.email}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-dark-800 px-3 py-1 border border-dark-700">
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-widest bg-dark-800 px-3 py-1 border border-dark-700">
                     {user.role}
                   </span>
                 </div>

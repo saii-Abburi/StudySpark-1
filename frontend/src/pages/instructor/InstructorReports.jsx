@@ -49,13 +49,13 @@ const InstructorReports = () => {
             <span className="w-8 h-1 bg-amber-500 mr-3"></span>
             Reported Questions
           </h1>
-          <p className="text-slate-400 mt-2 font-medium">Review and resolve issues reported by students.</p>
+          <p className="text-slate-200 mt-2 font-medium">Review and resolve issues reported by students.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
         {reports.length === 0 ? (
-          <div className="bg-dark-800 border border-dark-700 p-12 text-center text-slate-400">
+          <div className="bg-dark-800 border border-dark-700 p-12 text-center text-slate-200">
             No active reports right now.
           </div>
         ) : (
@@ -63,14 +63,14 @@ const InstructorReports = () => {
             <div key={report._id} className="bg-dark-800 border-l-4 border-amber-500 border-t border-r border-b border-dark-700 p-6 flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="space-y-4 flex-1">
                 <div className="flex items-center space-x-3">
-                  <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${
+                  <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest ${
                     report.status === 'pending' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
                     report.status === 'resolved' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                    'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    'bg-slate-500/10 text-slate-200 border border-slate-500/20'
                   }`}>
                     {report.status}
                   </span>
-                  <span className="text-slate-500 text-xs font-bold uppercase flex items-center">
+                  <span className="text-slate-300 text-xs font-bold uppercase flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
                     {new Date(report.createdAt).toLocaleDateString()}
                   </span>
@@ -104,7 +104,7 @@ const InstructorReports = () => {
                     </button>
                     <button
                       onClick={() => updateStatus(report._id, 'dismissed')}
-                      className="flex-1 flex items-center justify-center px-4 py-3 bg-dark-900 hover:bg-dark-700 text-slate-400 border border-dark-700 transition-colors text-xs font-bold uppercase tracking-widest"
+                      className="flex-1 flex items-center justify-center px-4 py-3 bg-dark-900 hover:bg-dark-700 text-slate-200 border border-dark-700 transition-colors text-xs font-bold uppercase tracking-widest"
                     >
                       <XCircle className="w-4 h-4 mr-2" /> Dismiss
                     </button>
