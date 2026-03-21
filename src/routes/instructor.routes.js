@@ -235,15 +235,29 @@ router.post(
                   [questionsToInsert[i], questionsToInsert[j]] = [questionsToInsert[j], questionsToInsert[i]];
                 }
 
-                questionsToInsert = questionsToInsert.filter(q => {
+                const parseLimit = (val) => (val !== '' && val !== null && val !== undefined) ? parseInt(val, 10) : null;
+                
+                const picked = [];
+                for (const q of questionsToInsert) {
+                   const totalLim = parseLimit(limits.total);
+                   if (totalLim !== null && counts.total >= totalLim) break;
+
+                   const diff = q.difficulty?.toLowerCase() || 'medium';
+                   const diffLim = parseLimit(limits[diff]);
+                   if (diffLim !== null && counts[diff] >= diffLim) continue;
+
                    const sub = q.subject?.toLowerCase();
-                   if (!sub || !limits[sub] || limits[sub] <= 0) return true; // Keep if no limit or not tracked subject
-                   if (counts[sub] < parseInt(limits[sub], 10)) {
-                     counts[sub]++;
-                     return true;
-                   }
-                   return false;
-                });
+                   const subLim = sub ? parseLimit(limits[sub]) : null;
+                   if (subLim !== null && counts[sub] >= subLim) continue;
+
+                   // It passed!
+                   counts.total++;
+                   counts[diff]++;
+                   if (sub) counts[sub] = (counts[sub] || 0) + 1;
+                   
+                   picked.push(q);
+                }
+                questionsToInsert = picked;
               } catch (e) {
                 console.warn('Failed to parse limits', e);
               }

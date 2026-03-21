@@ -19,6 +19,9 @@ const InstructorOverview = () => {
   const [csvFile, setCsvFile] = useState(null);
   const [uploadType, setUploadType] = useState('questions'); // 'questions' or 'flashcards'
   const [uploading, setUploading] = useState(false);
+  const [csvLimits, setCsvLimits] = useState({
+    total: '', easy: '', medium: '', hard: '', maths: '', physics: '', chemistry: '', biology: ''
+  });
 
   const fetchQuizzes = async () => {
     setLoading(true);
@@ -71,7 +74,7 @@ const InstructorOverview = () => {
     const formData = new FormData();
     formData.append('file', csvFile);
     if (uploadType === 'questions') {
-      formData.append('limits', JSON.stringify(subjectLimits));
+      formData.append('limits', JSON.stringify(csvLimits));
     }
 
     try {
@@ -170,23 +173,56 @@ const InstructorOverview = () => {
                   </div>
                   
                   {selectedQuizId && (
-                    <div className="bg-dark-900 p-4 border border-dark-700">
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Question Limits (Optional)</label>
-                       <p className="text-[10px] text-slate-500 mb-4 tracking-widest uppercase font-bold">Set how many questions of each subject to randomly pick from the CSV. Leave empty for all.</p>
-                       <div className="grid grid-cols-2 gap-3">
-                         {['maths', 'physics', 'chemistry', 'biology'].map(sub => (
-                           <div key={sub}>
-                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{sub}</label>
-                             <input 
-                               type="number"
-                               min="0"
-                               placeholder="All"
-                               value={subjectLimits[sub]}
-                               onChange={(e) => setSubjectLimits({...subjectLimits, [sub]: e.target.value})}
-                               className="w-full px-3 py-2 bg-dark-800 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-medium text-xs"
-                             />
-                           </div>
-                         ))}
+                    <div className="bg-dark-900 p-5 border border-dark-700 space-y-6">
+                       <div>
+                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Total Limit</label>
+                         <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">Maximum questions to pull from the file.</p>
+                         <input 
+                           type="number"
+                           min="0"
+                           placeholder="All (e.g. 50)"
+                           value={csvLimits.total}
+                           onChange={(e) => setCsvLimits({...csvLimits, total: e.target.value})}
+                           className="w-full px-3 py-2 bg-dark-800 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-medium text-xs"
+                         />
+                       </div>
+
+                       <div>
+                         <label className="block text-[10px] font-bold text-slate-400 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Difficulty Breakdown</label>
+                         <div className="grid grid-cols-3 gap-3">
+                           {['easy', 'medium', 'hard'].map(diff => (
+                             <div key={diff}>
+                               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{diff}</label>
+                               <input 
+                                 type="number"
+                                 min="0"
+                                 placeholder="All"
+                                 value={csvLimits[diff]}
+                                 onChange={(e) => setCsvLimits({...csvLimits, [diff]: e.target.value})}
+                                 className="w-full px-3 py-2 bg-dark-800 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-medium text-xs"
+                               />
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+
+                       <div>
+                         <label className="block text-[10px] font-bold text-slate-400 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Subject Breakdown</label>
+                         <div className="grid grid-cols-2 gap-3">
+                           {['maths', 'physics', 'chemistry', 'biology'].map(sub => (
+                             <div key={sub}>
+                               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{sub}</label>
+                               <input 
+                                 type="number"
+                                 min="0"
+                                 placeholder="All"
+                                 value={csvLimits[sub]}
+                                 onChange={(e) => setCsvLimits({...csvLimits, [sub]: e.target.value})}
+                                 className="w-full px-3 py-2 bg-dark-800 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-medium text-xs"
+                               />
+                             </div>
+                           ))}
+                         </div>
                        </div>
                     </div>
                   )}
