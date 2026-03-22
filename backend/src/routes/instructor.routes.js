@@ -192,13 +192,13 @@ router.post(
                   questionText: cleanedRow.questionText?.trim(),
 
                   options: {
-                    A: cleanedRow.optionA?.trim(),
-                    B: cleanedRow.optionB?.trim(),
-                    C: cleanedRow.optionC?.trim(),
-                    D: cleanedRow.optionD?.trim(),
+                    A: cleanedRow.optionA?.trim() || "None",
+                    B: cleanedRow.optionB?.trim() || "None",
+                    C: cleanedRow.optionC?.trim() || "None",
+                    D: cleanedRow.optionD?.trim() || "None",
                   },
 
-                  correctOption: cleanedRow.correctOption?.trim(),
+                  correctOption: cleanedRow.correctOption?.trim().toUpperCase(),
                   explanation: cleanedRow.explanation?.trim(),
 
                   marks: Number(cleanedRow.marks) || 1,
@@ -208,16 +208,16 @@ router.post(
                   chapter: cleanedRow.chapter?.trim(),
                   topic: cleanedRow.topic?.trim(),
 
-                  difficulty: cleanedRow.difficulty?.trim() || "medium",
+                  difficulty: cleanedRow.difficulty?.trim().toLowerCase() || "medium",
 
                   examYear: cleanedRow.examYear
                     ? Number(cleanedRow.examYear)
                     : undefined,
 
-                  isPYQ: cleanedRow.isPYQ === "true",
-                  isRepeated: cleanedRow.isRepeated === "true",
+                  isPYQ: cleanedRow.isPYQ?.toLowerCase() === "true",
+                  isRepeated: cleanedRow.isRepeated?.toLowerCase() === "true",
 
-                  importance: cleanedRow.importance?.trim() || "medium",
+                  importance: cleanedRow.importance?.trim().toLowerCase() || "medium",
 
                   createdBy: req.user._id,
                 };
@@ -230,12 +230,9 @@ router.post(
                 const limits = JSON.parse(limitsRaw);
                 const counts = { total: 0, easy: 0, medium: 0, hard: 0, maths: 0, physics: 0, chemistry: 0, biology: 0 };
                 
-                // Shuffle array so we don't always pick the first questions
-                for (let i = questionsToInsert.length - 1; i > 0; i--) {
-                  const j = Math.floor(Math.random() * (i + 1));
-                  [questionsToInsert[i], questionsToInsert[j]] = [questionsToInsert[j], questionsToInsert[i]];
-                }
-
+                // We deliberately DO NOT shuffle the array here anymore.
+                // This ensures if an instructor uploads a specifically ordered 
+                // mock test (e.g. 80 Maths, 40 Physics, 40 Chem), the order is preserved.
                 const parseLimit = (val) => (val !== '' && val !== null && val !== undefined) ? parseInt(val, 10) : null;
                 
                 const hasDiffLimit = ['easy', 'medium', 'hard'].some(d => parseLimit(limits[d]) !== null);
