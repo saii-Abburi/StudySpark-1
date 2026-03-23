@@ -29,7 +29,10 @@ export default api;
 
 export const authService = {
   login: (credentials) => api.post('/login', credentials),
+  sendSignupOtp: (email) => api.post('/send-signup-otp', { email }),
   register: (userData) => api.post('/signup', userData),
+  sendForgotOtp: (email) => api.post('/send-forgot-otp', { email }),
+  resetPassword: (data) => api.post('/reset-password', data),
   logout: () => api.post('/logout'),
 };
 

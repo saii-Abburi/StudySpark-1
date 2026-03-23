@@ -1,25 +1,50 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Mail, Lock, User, ArrowRight, Loader, AlertCircle } from 'lucide-react';
+import { BookOpen, Mail, Lock, User, ArrowRight, Loader, AlertCircle, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { authService } from '../services/api';
 
 export default function Register() {
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '' });
+  const [step, setStep] = useState(1); // 1 = Details, 2 = OTP
+  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '', otp: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  const handleSubmit = async (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
+    if (formData.password.length < 6) {
+      return setErrorMsg('Password must be at least 6 characters');
+    }
+    
+    setIsLoading(true);
+    setErrorMsg('');
+    try {
+      await authService.sendSignupOtp(formData.email);
+      setSuccessMsg(`OTP sent to ${formData.email}`);
+      setStep(2);
+    } catch (err) {
+      setErrorMsg(err.response?.data?.error || 'Failed to send OTP');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyAndRegister = async (e) => {
+    e.preventDefault();
+    if (!formData.otp || formData.otp.length !== 6) {
+      return setErrorMsg('Please enter a valid 6-digit OTP');
+    }
+
     setIsLoading(true);
     setErrorMsg('');
     
     const result = await register(formData);
     
     if (result.success) {
-      // Assuming Backend doesn't auto-login, we navigate to login page
-      navigate('/login', { state: { message: 'Registration successful! Please login.' } });
+      navigate('/login', { state: { message: 'Registration and verification successful! Please login.' } });
     } else {
       setErrorMsg(result.error || 'Failed to register');
     }
@@ -53,13 +78,20 @@ export default function Register() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-dark-800 py-8 px-4 sm:rounded-none sm:px-10 border border-dark-700 shadow-2xl">
           {errorMsg && (
-            <div className="mb-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-md flex items-start">
+            <div className="mb-4 bg-red-500/10 border-l-4 border-red-500 p-4 flex items-start">
               <AlertCircle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0" />
-              <p className="text-sm text-red-700 dark:text-red-400">{errorMsg}</p>
+              <p className="text-sm text-red-500 font-bold">{errorMsg}</p>
+            </div>
+          )}
+          {successMsg && (
+            <div className="mb-4 bg-green-500/10 border-l-4 border-green-500 p-4 flex items-start">
+              <AlertCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+              <p className="text-sm text-green-500 font-bold">{successMsg}</p>
             </div>
           )}
           
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          {step === 1 ? (
+            <form className="space-y-6" onSubmit={handleSendOtp}>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
@@ -154,12 +186,62 @@ export default function Register() {
                   <Loader className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
-                    Create Account <ArrowRight className="ml-2 h-5 w-5" />
+                    Send Verification Code <ArrowRight className="ml-2 h-5 w-5" />
                   </>
                 )}
               </button>
             </div>
           </form>
+          ) : (
+          <form className="space-y-6" onSubmit={handleVerifyAndRegister}>
+            <div>
+              <label htmlFor="otp" className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 text-center">
+                Enter 6-Digit Code
+              </label>
+              <div className="mt-1 relative rounded-md shadow-sm max-w-xs mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <KeyRound className="h-5 w-5 text-slate-300" />
+                </div>
+                <input
+                  id="otp"
+                  name="otp"
+                  type="text"
+                  maxLength="6"
+                  required
+                  className="block w-full pl-10 sm:text-lg text-center rounded-none py-4 border-dark-600 bg-dark-900 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-colors text-white font-black tracking-[0.5em] placeholder-slate-700"
+                  placeholder="000000"
+                  value={formData.otp}
+                  onChange={(e) => setFormData({...formData, otp: e.target.value.replace(/\D/g, '')})}
+                />
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center py-4 px-4 border border-transparent rounded-none text-sm font-bold text-white bg-primary-500 hover:bg-primary-600 transition-all uppercase tracking-widest disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <Loader className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    Verify & Create Account <ArrowRight className="ml-2 h-5 w-5" />
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+              >
+                Back to details
+              </button>
+            </div>
+          </form>
+          )}
         </div>
       </div>
     </div>

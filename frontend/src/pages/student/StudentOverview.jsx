@@ -160,7 +160,7 @@ const StudentOverview = () => {
             <h3 className="font-bold text-xs uppercase tracking-widest text-slate-200">Total Points</h3>
           </div>
           <div className="text-3xl font-black text-white">{totalScore}</div>
-          <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">Lifetime earnings</p>
+          <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">Lifetime Points</p>
         </div>
         
         <div className="bg-dark-800 p-6 border-l-4 border-l-amber-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 shrink-0">

@@ -9,7 +9,7 @@ const testSchema = new mongoose.Schema(
     subject: {
       type: String,
       required: true,
-      enum: ["biology", "chemistry", "physics", "maths", "engineering", "medical", "general"],
+      enum: ["biology", "chemistry", "physics", "maths", "engineering", "agriculture", "general"],
     },
     testType: {
       type: String,
@@ -24,7 +24,7 @@ const testSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["engineering", "medical"],
+      enum: ["engineering", "agriculture"],
     },
     duration: {
       type: Number, // in minutes
