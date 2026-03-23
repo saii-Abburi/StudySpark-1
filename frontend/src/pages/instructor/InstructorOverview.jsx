@@ -11,7 +11,7 @@ const InstructorOverview = () => {
 
   // Create Quiz State
   const [isCreating, setIsCreating] = useState(false);
-  const [newQuiz, setNewQuiz] = useState({ title: '', subject: 'physics', category: 'engineering', duration: 60, testType: 'chapter-wise', difficulty: 'mixed' });
+  const [newQuiz, setNewQuiz] = useState({ title: '', subject: 'physics', category: 'engineering', duration: 60, testType: 'chapter-wise' });
   const [createError, setCreateError] = useState('');
 
   // CSV Upload State
@@ -20,7 +20,7 @@ const InstructorOverview = () => {
   const [uploadType, setUploadType] = useState('questions'); // 'questions' or 'flashcards'
   const [uploading, setUploading] = useState(false);
   const [csvLimits, setCsvLimits] = useState({
-    total: '', easy: '', medium: '', hard: '', maths: '', physics: '', chemistry: '', biology: ''
+    total: '', maths: '', physics: '', chemistry: '', biology: ''
   });
 
   const fetchQuizzes = async () => {
@@ -50,7 +50,7 @@ const InstructorOverview = () => {
       const response = await instructorService.createQuiz(payload);
       setQuizzes([response.data, ...quizzes]);
       setIsCreating(false);
-      setNewQuiz({ title: '', subject: 'physics', category: 'engineering', duration: 60, testType: 'chapter-wise', difficulty: 'mixed' });
+      setNewQuiz({ title: '', subject: 'physics', category: 'engineering', duration: 60, testType: 'chapter-wise' });
     } catch (err) {
       setCreateError(err.response?.data?.error || 'Failed to create test.');
     }
@@ -186,24 +186,7 @@ const InstructorOverview = () => {
                          />
                        </div>
 
-                       <div>
-                         <label className="block text-xs font-bold text-slate-200 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Difficulty Breakdown</label>
-                         <div className="grid grid-cols-3 gap-3">
-                           {['easy', 'medium', 'hard'].map(diff => (
-                             <div key={diff}>
-                               <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-1">{diff}</label>
-                               <input 
-                                 type="number"
-                                 min="0"
-                                 placeholder="All"
-                                 value={csvLimits[diff]}
-                                 onChange={(e) => setCsvLimits({...csvLimits, [diff]: e.target.value})}
-                                 className="w-full px-3 py-2 bg-dark-800 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-medium text-xs"
-                               />
-                             </div>
-                           ))}
-                         </div>
-                       </div>
+
 
                        <div>
                          <label className="block text-xs font-bold text-slate-200 border-b border-dark-700 pb-2 mb-3 uppercase tracking-widest">Subject Breakdown</label>
@@ -353,19 +336,7 @@ const InstructorOverview = () => {
                   </div>
                 )}
                 
-                <div>
-                  <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Difficulty</label>
-                  <select 
-                    value={newQuiz.difficulty}
-                    onChange={(e) => setNewQuiz({...newQuiz, difficulty: e.target.value})}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold uppercase text-xs tracking-widest"
-                  >
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                    <option value="mixed">Mixed (General)</option>
-                  </select>
-                </div>
+
                 <div>
                   <label className="block text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Duration (Mins)</label>
                   <input 
@@ -413,9 +384,7 @@ const InstructorOverview = () => {
                           ? (quiz.category === 'engineering' ? '80 Maths • 40 Physics • 40 Chemistry' : '80 Biology • 40 Physics • 40 Chemistry') 
                           : quiz.subject}
                       </span>
-                      <span className="px-3 py-1 bg-dark-900 border border-dark-700 text-slate-200 text-xs font-bold uppercase tracking-widest">
-                        {quiz.difficulty || 'mixed'}
-                      </span>
+
                       <h3 className="text-xl font-bold text-white leading-snug">{quiz.title}</h3>
                     </div>
                     <div className="flex items-center text-xs font-bold uppercase tracking-widest text-slate-300 space-x-6 ml-1">

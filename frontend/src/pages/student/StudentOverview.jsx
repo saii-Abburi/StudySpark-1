@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { studentService } from '../../services/api';
-import { Play, CheckCircle, Award, Target, Activity, Clock, BookOpen, ArrowRight, AlertCircle } from 'lucide-react';
+import { Play, CheckCircle, Award, Target, Activity, Clock, BookOpen, ArrowRight, AlertCircle, Calendar, Trash2, Plus } from 'lucide-react';
 import { customToast } from '../../utils/toast';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useAuth } from '../../context/AuthContext';
 
 const StudentOverview = () => {
   const [tests, setTests] = useState([]);
@@ -10,6 +12,11 @@ const StudentOverview = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
+  
+  const targetExams = user?.targetExams || [];
+  const [isAddingExam, setIsAddingExam] = useState(false);
+  const [newExam, setNewExam] = useState({ name: '', date: '' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,6 +70,49 @@ const StudentOverview = () => {
   
   // Find active attempts
   const activeAttempts = (attempts || []).filter(a => a.status === 'started');
+
+  const handleAddExam = async () => {
+    if (!newExam.name || !newExam.date) return;
+    if (targetExams.length >= 3) return customToast.error("Maximum 3 exams allowed");
+    
+    try {
+      const updatedExams = [...targetExams, newExam];
+      const res = await studentService.updateExams(updatedExams);
+      updateUser({ targetExams: res.data.targetExams });
+      setNewExam({ name: '', date: '' });
+      setIsAddingExam(false);
+      customToast.success("Exam countdown added!");
+    } catch (err) {
+      customToast.error("Failed to add exam.");
+    }
+  };
+
+  const handleRemoveExam = async (index) => {
+    try {
+      const updatedExams = targetExams.filter((_, i) => i !== index);
+      const res = await studentService.updateExams(updatedExams);
+      updateUser({ targetExams: res.data.targetExams });
+      customToast.success("Exam removed.");
+    } catch (err) {
+      customToast.error("Failed to remove exam.");
+    }
+  };
+
+  const calculateDaysLeft = (targetDate) => {
+    const diffTime = new Date(targetDate) - new Date();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  // Prepare data for the performance chart
+  const chartData = [...completedAttempts]
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    .slice(-10) // Show last 10 attempts
+    .map(a => ({
+      name: a.test?.title?.length > 15 ? a.test?.title?.substring(0, 15) + '...' : a.test?.title || 'Test',
+      score: a.score || 0,
+      date: new Date(a.createdAt).toLocaleDateString()
+    }));
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -122,6 +172,138 @@ const StudentOverview = () => {
           <p className="text-xs text-slate-300 font-bold uppercase tracking-widest mt-2">New tests ready</p>
         </div>
       </div>
+
+      {/* Target Exams Countdown */}
+      <div className="bg-dark-800 border border-dark-700 p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-black text-white uppercase tracking-wide flex items-center">
+            <span className="w-6 h-1 bg-amber-500 mr-3"></span>
+            Exam Countdowns
+          </h2>
+          {targetExams.length < 3 && !isAddingExam && (
+            <button 
+              onClick={() => setIsAddingExam(true)}
+              className="text-xs font-bold text-amber-500 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg flex items-center transition-colors uppercase tracking-widest"
+            >
+              <Plus className="w-4 h-4 mr-1" /> Add Exam Track
+            </button>
+          )}
+        </div>
+
+        {isAddingExam && (
+          <div className="bg-dark-900 border border-dark-700 p-4 rounded-xl flex flex-col sm:flex-row items-end gap-4 mb-6 relative overflow-hidden">
+            <div className="w-full sm:w-1/2">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Exam Name</label>
+              <input 
+                type="text" 
+                placeholder="e.g. AP EAPCET" 
+                className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"
+                value={newExam.name}
+                onChange={e => setNewExam({...newExam, name: e.target.value})}
+              />
+            </div>
+            <div className="w-full sm:w-1/3">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Target Date</label>
+              <input 
+                type="date" 
+                className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"
+                value={newExam.date}
+                onChange={e => setNewExam({...newExam, date: e.target.value})}
+              />
+            </div>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button 
+                onClick={handleAddExam}
+                className="flex-1 sm:flex-none bg-amber-500 text-white font-bold text-xs uppercase px-4 py-2.5 rounded-lg hover:bg-amber-600 transition"
+              >
+                Save
+              </button>
+              <button 
+                onClick={() => setIsAddingExam(false)}
+                className="flex-1 sm:flex-none border border-dark-600 text-slate-300 font-bold text-xs uppercase px-4 py-2.5 rounded-lg hover:bg-dark-700 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {targetExams.length === 0 && !isAddingExam ? (
+          <div className="text-center py-6 border border-dashed border-dark-700 rounded-xl text-slate-400 text-sm">
+            Track up to 3 upcoming exams and stay focused!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {targetExams.map((exam, idx) => {
+              const daysLeft = calculateDaysLeft(exam.date);
+              return (
+                <div key={idx} className="bg-dark-900 border border-dark-700 p-5 relative overflow-hidden group hover:border-amber-500/50 transition-colors">
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => handleRemoveExam(idx)} className="text-slate-500 hover:text-red-500 transition">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <Calendar className="w-6 h-6 text-amber-500 mb-3" />
+                  <h3 className="text-white font-bold text-lg mb-1 truncate">{exam.name}</h3>
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-3xl font-black text-amber-500">{daysLeft}</span>
+                    <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Days Left</span>
+                  </div>
+                  <div className="text-xs text-slate-500 mt-3 font-medium">Target: {new Date(exam.date).toLocaleDateString()}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Performance Chart */}
+      {chartData.length > 1 && (
+        <div className="bg-dark-800 border border-dark-700 p-6 sm:p-8">
+          <h2 className="text-xl font-black text-white uppercase tracking-wide flex items-center mb-6">
+            <span className="w-6 h-1 bg-indigo-500 mr-3"></span>
+            Performance History
+          </h2>
+          <div className="h-64 sm:h-80 w-full min-h-[300px]" style={{ minWidth: 0 }}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+              <LineChart data={chartData} margin={{ top: 5, right: 30, bottom: 25, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="#94a3b8" 
+                  fontSize={10} 
+                  tickLine={false} 
+                  axisLine={false} 
+                  dy={10}
+                />
+                <YAxis 
+                  stroke="#94a3b8" 
+                  fontSize={11} 
+                  tickLine={false} 
+                  axisLine={false} 
+                  dx={-10}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc', padding: '12px' }}
+                  itemStyle={{ color: '#8b5cf6', fontWeight: '900', fontSize: '16px' }}
+                  labelStyle={{ color: '#94a3b8', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}
+                  formatter={(value) => [`${value} Points`, 'Score']}
+                  labelFormatter={(label) => `Test: ${label}`}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="score" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={4} 
+                  dot={{ fill: '#8b5cf6', r: 5, strokeWidth: 2, stroke: '#1e293b' }} 
+                  activeDot={{ r: 8, fill: '#a78bfa', stroke: '#fff', strokeWidth: 2 }} 
+                  animationDuration={1500}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         

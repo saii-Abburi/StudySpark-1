@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { studentService } from '../../services/api';
 import { Clock, ChevronRight, ChevronLeft, CheckCircle, AlertTriangle, BookMarked, Flag, BookOpen } from 'lucide-react';
 import { customToast } from '../../utils/toast';
+import RichText from '../../components/RichText';
 
 const TestTakingInterface = () => {
   const { attemptId } = useParams();
@@ -215,9 +216,9 @@ const TestTakingInterface = () => {
               <span className="inline-block px-3 py-1 bg-dark-900 border border-dark-700 text-slate-300 text-xs font-bold uppercase tracking-widest mb-4">
                 Question {currentIdx + 1}
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
-                {currentQ?.questionText}
-              </h2>
+              <div className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
+                <RichText content={currentQ?.questionText} />
+              </div>
               <div className="mt-4 text-xs font-bold text-slate-300 uppercase tracking-widest">
                 Marks: <span className="text-green-500 ml-1">+{currentQ?.marks || 4}</span>
               </div>
@@ -241,7 +242,7 @@ const TestTakingInterface = () => {
                   }`}>
                     {opt}
                   </div>
-                  <span className="text-base sm:text-lg leading-relaxed">{currentQ?.options[opt]}</span>
+                  <span className="text-base sm:text-lg leading-relaxed w-full"><RichText content={currentQ?.options[opt]} /></span>
                 </button>
               ))}
             </div>

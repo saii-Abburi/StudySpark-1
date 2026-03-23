@@ -257,4 +257,57 @@ router.get(
   },
 );
 
+// GET /student/search
+// Global search across tests
+router.get("/search", auth, allowRoles("student"), async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.status(200).json({ tests: [] });
+
+    const searchRegex = new RegExp(q, "i");
+
+    const tests = await Test.find({
+      $or: [
+        { title: searchRegex },
+        { subject: searchRegex },
+        { category: searchRegex }
+      ]
+    }).select("title subject category duration testType").limit(10);
+
+    // If there were other searchable models (like Flashcards or Resources), you could query them here and return them in the same payload.
+    res.status(200).json({ tests });
+  } catch (err) {
+    res.status(500).json({ error: "Search failed" });
+  }
+});
+
+// POST /student/exams
+// Update target exams
+router.post("/exams", auth, allowRoles("student"), async (req, res) => {
+  try {
+    const { exams } = req.body;
+    
+    // Quick validation
+    if (!Array.isArray(exams) || exams.length > 3) {
+      return res.status(400).json({ error: "You can only track up to 3 exams." });
+    }
+
+    // Usually User is imported at top, but to avoid circular or missing dependencies if not imported:
+    const User = require("../models/User");
+    const user = await User.findById(req.user._id);
+    
+    user.targetExams = exams.map(e => ({
+      name: e.name,
+      date: new Date(e.date)
+    }));
+    
+    await user.save();
+    
+    res.status(200).json({ message: "Exams updated successfully", targetExams: user.targetExams });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update exams" });
+  }
+});
+
 module.exports = router;

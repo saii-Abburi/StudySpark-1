@@ -52,6 +52,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    
+    targetExams: {
+      type: [{
+        name: { type: String, required: true, trim: true },
+        date: { type: Date, required: true }
+      }],
+      validate: [val => val.length <= 3, '{PATH} exceeds the limit of 3']
+    },
   },
   { timestamps: true },
 );

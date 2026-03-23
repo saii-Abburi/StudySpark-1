@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
@@ -18,7 +18,8 @@ import {
   ChevronDown,
   ChevronRight,
   ClipboardList,
-  Plus
+  Plus,
+  Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -60,12 +61,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     ...(user?.role === 'admin' ? [
       { name: 'Manage Users', path: '/dashboard/users', icon: <Users className="h-5 w-5" /> },
     ] : []),
+    { name: '45 Days Plan', path: '/dashboard/plan-45', icon: <Calendar className="h-5 w-5" /> },
+    { name: '30 Days Plan', path: '/dashboard/plan-30', icon: <Calendar className="h-5 w-5" /> },
     { name: 'Settings', path: '/dashboard/settings', icon: <Settings className="h-5 w-5" /> },
   ];
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Sidebar overlay (Mobile only) */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
@@ -73,18 +76,18 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         />
       )}
 
-      {/* Sidebar sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-dark-900 border-r border-dark-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      {/* Sidebar drawer */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-dark-900 border-r border-dark-800 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between h-20 px-6 border-b border-dark-800">
-            <Link to="/" className="flex items-center space-x-2">
+          {/* Logo - Hidden on desktop as requested */}
+          <div className="lg:hidden flex items-center justify-between h-20 px-6 border-b border-dark-800">
+            <Link to="/dashboard" className="flex items-center space-x-2">
               <BookOpen className="h-6 w-6 text-primary-500" />
               <span className="text-xl font-black uppercase text-white tracking-tight">
                 Study<span className="text-primary-500">Spark</span>
               </span>
             </Link>
-            <button className="lg:hidden text-slate-300 hover:text-white" onClick={() => setIsOpen(false)}>
+            <button className="text-slate-300 hover:text-white" onClick={() => setIsOpen(false)}>
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -210,26 +213,112 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 };
 
 const Header = ({ setIsOpen }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // Debounced search
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      if (user?.role !== 'student') return; // Only implement for student right now
+      try {
+        setIsSearching(true);
+        const { studentService } = await import('../services/api');
+        const res = await studentService.searchTests(query);
+        setResults(res.data?.tests || []);
+        setShowDropdown(true);
+      } catch (err) {
+        console.error('Search failed', err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [query, user]);
+
   return (
     <header className="bg-dark-900/90 backdrop-blur-md border-b border-dark-800 h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30">
       <div className="flex items-center">
         <button 
-          onClick={() => setIsOpen(true)}
-          className="lg:hidden mr-4 text-slate-200 hover:text-white transition-colors"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="mr-6 text-slate-200 hover:text-white transition-colors"
         >
           <Menu className="h-6 w-6" />
         </button>
+
+        <Link to="/" className="flex items-center space-x-2 mr-6">
+          <BookOpen className="h-6 w-6 text-primary-500" />
+          <span className="text-xl font-black uppercase text-white tracking-tight hidden sm:block">
+            Study<span className="text-primary-500">Spark</span>
+          </span>
+        </Link>
         
         {/* Search */}
         <div className="relative hidden sm:block w-64 md:w-96">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-300" />
+            <Search className={`h-5 w-5 ${isSearching ? 'text-primary-500 animate-pulse' : 'text-slate-300'}`} />
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-dark-700 bg-dark-800 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all sm:text-sm"
-            placeholder="Search materials, notes..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => { if (results.length > 0) setShowDropdown(true); }}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)} // delay so clicks register
+            className="block w-full pl-10 pr-3 py-2 border border-dark-700 bg-dark-800 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all sm:text-sm font-medium tracking-wide"
+            placeholder="Search mock tests, chapters..."
           />
+          
+          {/* Search Dropdown */}
+          {showDropdown && (
+            <div className="absolute top-12 left-0 w-full bg-dark-800 border border-dark-700 shadow-2xl z-50 overflow-hidden">
+              {results.length > 0 ? (
+                <div className="max-h-80 overflow-y-auto divide-y divide-dark-700/50">
+                  <div className="px-4 py-2 bg-dark-900 border-b border-dark-700 text-xs font-bold uppercase tracking-widest text-primary-500">
+                    Test Results ({results.length})
+                  </div>
+                  {results.map(test => (
+                    <button
+                      key={test._id}
+                      onClick={() => {
+                        setShowDropdown(false);
+                        setQuery('');
+                        // If it's a test, we could navigate to a preview or dashboard
+                        // Actually just navigate to dashboard and let them find it, or we can go to /tests
+                        if (test.testType === 'mock') {
+                           navigate(`/dashboard/tests/mock/${test.category || 'medical'}`);
+                        } else {
+                           navigate(`/dashboard/tests/chapter-wise/${test.subject || 'physics'}`);
+                        }
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-dark-700 transition-colors group flex items-start"
+                    >
+                      <BookOpen className="w-4 h-4 text-slate-400 group-hover:text-primary-500 mr-3 mt-0.5 shrink-0" />
+                      <div>
+                        <div className="text-sm font-bold text-white leading-tight">{test.title}</div>
+                        <div className="text-xs text-slate-400 uppercase tracking-widest mt-1">
+                          {test.subject || test.category} • {test.duration}m
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-sm text-slate-400 font-medium">
+                  No tests found for "{query}"
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -265,8 +354,17 @@ const UploadArea = () => <div className="text-slate-900 dark:text-white h-96 fle
 const SettingsArea = () => <div className="text-slate-900 dark:text-white h-96 flex items-center justify-center bg-white dark:bg-dark-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">User Settings</div>;
 
 export default function Dashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const { user } = useAuth();
+
+  // Resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth >= 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   let OverviewComponent;
   let ResourcesComponent;
@@ -283,7 +381,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-dark-900 flex text-slate-300 font-sans">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       
-      <div className="flex-1 flex flex-col lg:pl-72 min-h-screen transition-all duration-300">
+      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${sidebarOpen ? 'lg:pl-72' : 'lg:pl-0'}`}>
         <Header setIsOpen={setSidebarOpen} />
         
         <main className="flex-1 p-4 sm:p-6 lg:p-10">

@@ -18,7 +18,8 @@ api.interceptors.response.use(
     // Handle unauthorized errors (e.g., redirect to login)
     if (error.response && error.response.status === 401) {
       console.log('Unauthorized, redirecting to login...');
-      // Optional: window.location.href = '/login';
+      localStorage.removeItem('user');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
@@ -39,6 +40,8 @@ export const studentService = {
   startTest: (testId) => api.post(`/student/tests/${testId}/start`),
   submitTest: (attemptId, answers) => api.post(`/student/tests/${attemptId}/submit`, { answers }),
   getAttemptResults: (attemptId) => api.get(`/student/results/${attemptId}`),
+  searchTests: (q) => api.get('/student/search', { params: { q } }),
+  updateExams: (exams) => api.post('/student/exams', { exams }),
   
   // Phase 3 Extensions
   reportQuestion: (data) => api.post('/student/report-question', data),

@@ -4,6 +4,7 @@ import { studentService } from '../../services/api';
 import { CheckCircle, XCircle, ArrowLeft, Plus, AlertTriangle, BookMarked } from 'lucide-react';
 import toast from 'not-a-toast';
 import 'not-a-toast/style.css';
+import RichText from '../../components/RichText';
 
 const StudentResults = () => {
   const { attemptId } = useParams();
@@ -20,6 +21,13 @@ const StudentResults = () => {
       try {
         const response = await studentService.getAttemptResults(attemptId);
         setResult(response.data);
+        
+        // Auto-expand all explanations by default
+        if (response.data?.answers) {
+          const allQuestionIds = response.data.answers.map(a => a.question?._id).filter(Boolean);
+          setExpandedExplanations(new Set(allQuestionIds));
+        }
+
         if (response.data?.test?.testType === 'mock') {
           const subjects = [...new Set(response.data.answers.map(a => a.question?.subject))].filter(Boolean);
           if (subjects.length > 0) setActiveSubject(subjects[0]);
@@ -173,9 +181,9 @@ const StudentResults = () => {
                      )}
                   </div>
                   
-                  <h4 className="text-lg font-bold text-white mb-6 leading-snug">
-                    {q.questionText}
-                  </h4>
+                  <div className="text-lg font-bold text-white mb-6 leading-snug">
+                    <RichText content={q.questionText} />
+                  </div>
 
                   <div className="flex space-x-2 mb-8 border-b border-dark-700 pb-6">
                     <button
@@ -248,7 +256,7 @@ const StudentResults = () => {
                       return (
                         <div key={opt} className={`flex items-start p-4 border transition-colors ${optionStyle}`}>
                           <strong className="mr-4 mt-0.5 text-xs font-bold uppercase">{opt}.</strong>
-                          <span className="leading-relaxed flex-1">{optText}</span>
+                          <div className="leading-relaxed flex-1"><RichText content={optText} /></div>
                           
                           {/* Indicators */}
                           {isActualCorrect && <CheckCircle className="w-5 h-5 text-green-500 ml-3 shrink-0" />}
@@ -280,9 +288,9 @@ const StudentResults = () => {
                       </button>
                       
                       <div className={`transition-all duration-300 ease-in-out ${
-                        expandedExplanations.has(q._id) ? 'max-h-96 opacity-100 p-4 border-t border-t-dark-700' : 'max-h-0 opacity-0 p-0 overflow-hidden'
+                        expandedExplanations.has(q._id) ? 'max-h-96 opacity-100 p-4 border-t border-t-dark-700 overflow-y-auto' : 'max-h-0 opacity-0 p-0 overflow-hidden'
                       }`}>
-                        <p className="text-sm leading-relaxed text-slate-300">{q.explanation}</p>
+                        <div className="text-sm leading-relaxed text-slate-300"><RichText content={q.explanation} /></div>
                       </div>
                     </div>
                   )}

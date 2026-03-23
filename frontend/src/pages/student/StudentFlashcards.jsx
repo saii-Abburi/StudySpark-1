@@ -11,7 +11,6 @@ const StudentFlashcards = () => {
 
   // Filters
   const [subject, setSubject] = useState('');
-  const [difficulty, setDifficulty] = useState('');
 
   useEffect(() => {
     const fetchFlashcards = async () => {
@@ -19,7 +18,6 @@ const StudentFlashcards = () => {
       try {
         const filters = {};
         if (subject) filters.subject = subject;
-        if (difficulty) filters.difficulty = difficulty;
 
         const response = await studentService.getFlashcards(filters);
         setFlashcards(response.data.flashcards);
@@ -32,7 +30,7 @@ const StudentFlashcards = () => {
     };
 
     fetchFlashcards();
-  }, [subject, difficulty]);
+  }, [subject]);
 
   const handleNext = () => {
     if (currentIndex < flashcards.length - 1) {
@@ -94,17 +92,6 @@ const StudentFlashcards = () => {
             <option value="physics">Physics</option>
             <option value="maths">Maths</option>
           </select>
-
-          <select 
-            value={difficulty} 
-            onChange={(e) => setDifficulty(e.target.value)}
-            className="px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 transition-colors text-white font-bold text-xs uppercase tracking-widest"
-          >
-            <option value="">All Difficulties</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
         </div>
       </div>
 
@@ -139,16 +126,7 @@ const StudentFlashcards = () => {
                   </span>
                 </div>
 
-                {/* Decorative Top Right */}
-                <div className="absolute top-6 right-6 flex items-center space-x-2">
-                  <span className={`px-3 py-1 text-xs font-bold uppercase tracking-widest border ${
-                    currentCard.difficulty === 'easy' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                    currentCard.difficulty === 'medium' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                    'bg-red-500/10 text-red-500 border-red-500/20'
-                  }`}>
-                    {currentCard.difficulty || 'medium'}
-                  </span>
-                </div>
+
 
                 <div className="w-16 h-1 bg-primary-500 mb-8 mt-4"></div>
                 <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">

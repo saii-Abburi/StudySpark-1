@@ -340,7 +340,10 @@ router.get(
   allowRoles("instructor", "admin"),
   async (req, res) => {
     try {
-      const test = await Test.findById(req.params.testId).populate("questions");
+      const test = await Test.findById(req.params.testId).populate({
+        path: "questions",
+        select: "+explanation +correctOption"
+      });
 
       if (!test) {
         return res.status(404).json({ error: "Test not found" });

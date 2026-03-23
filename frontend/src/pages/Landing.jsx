@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Home from '../components/Home';
 
 export default function Landing() {
   const [isDark, setIsDark] = useState(true);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     // Add dark class on mount to ensure default is dark mode
@@ -17,6 +20,13 @@ export default function Landing() {
   const toggleDark = () => {
     setIsDark(!isDark);
   };
+
+  if (loading) return null;
+  
+  // Strict redirect: never show landing page to logged in users
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${isDark ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>

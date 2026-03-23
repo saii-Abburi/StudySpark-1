@@ -1,7 +1,7 @@
 const express = require("express");
 const validateSignUpData = require("../utils/validation");
 const bcrypt = require("bcrypt");
-const User = require("../models/user");
+const User = require("../models/User");
 
 const authRouter = express.Router();
 
@@ -80,6 +80,7 @@ authRouter.post("/login", async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        targetExams: user.targetExams,
       },
     });
   } catch (err) {

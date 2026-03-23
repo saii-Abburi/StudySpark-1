@@ -16,7 +16,8 @@ const Navbar = ({ isDark, toggleDark }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState(null);
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,9 +37,7 @@ const Navbar = ({ isDark, toggleDark }) => {
 
   const getDashboardPath = () => {
     if (!user) return "/login";
-    if (user.role === 'admin') return "/admin/dashboard";
-    if (user.role === 'instructor') return "/instructor/dashboard";
-    return "/student/dashboard";
+    return "/dashboard";
   };
 
   return (
@@ -49,7 +48,7 @@ const Navbar = ({ isDark, toggleDark }) => {
         {/*
          Logo */}
         <Link
-          to="/"
+          to={isAuthenticated ? getDashboardPath() : "/"}
           className={`text-2xl font-extrabold tracking-tight ${textColor}`}
         >
           Study <span className="text-accent">Sparks</span>
@@ -57,7 +56,7 @@ const Navbar = ({ isDark, toggleDark }) => {
 
         {/* Desktop Nav */}
         <div className={`hidden md:flex items-center space-x-8 text-sm font-medium ${textColor}`}>
-          <Link to="/" className="hover:text-accent transition">Home</Link>
+          <Link to={isAuthenticated ? getDashboardPath() : "/"} className="hover:text-accent transition">Home</Link>
           <a href="#roadmap" className="hover:text-accent transition">Roadmap</a>
           <a href="#feedback" className="hover:text-accent transition">Feedback</a>
 
@@ -118,7 +117,12 @@ const Navbar = ({ isDark, toggleDark }) => {
               }`}
           >
             <div className={`flex flex-col p-6 space-y-4 ${textColor}`}>
-              <Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+              <Link 
+                to={isAuthenticated ? getDashboardPath() : "/"} 
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
               <a href="#roadmap" onClick={() => setMobileMenuOpen(false)}>Roadmap</a>
               <a href="#feedback" onClick={() => setMobileMenuOpen(false)}>Feedback</a>
 
