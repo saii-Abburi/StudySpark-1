@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Home from '../components/Home';
+import Footer from '../components/Footer';
 
 export default function Landing() {
   const [isDark, setIsDark] = useState(true);
@@ -29,11 +30,12 @@ export default function Landing() {
   }
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${isDark ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 scroll-smooth ${isDark ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
       <Navbar isDark={isDark} toggleDark={toggleDark} />
       <div className="flex-grow">
         <Home />
       </div>
+      <Footer />
     </div>
   );
 }

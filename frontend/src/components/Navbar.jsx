@@ -57,8 +57,9 @@ const Navbar = ({ isDark, toggleDark }) => {
         {/* Desktop Nav */}
         <div className={`hidden md:flex items-center space-x-8 text-sm font-medium ${textColor}`}>
           <Link to={isAuthenticated ? getDashboardPath() : "/"} className="hover:text-accent transition">Home</Link>
-          <a href="#roadmap" className="hover:text-accent transition">Roadmap</a>
-          <a href="#feedback" className="hover:text-accent transition">Feedback</a>
+          <a href="#about" className="hover:text-accent transition">About</a>
+          <a href="#faq" className="hover:text-accent transition">FAQ</a>
+          <a href="#contact" className="hover:text-accent transition">Contact</a>
 
           <button
             onClick={toggleDark}
@@ -123,8 +124,9 @@ const Navbar = ({ isDark, toggleDark }) => {
               >
                 Home
               </Link>
-              <a href="#roadmap" onClick={() => setMobileMenuOpen(false)}>Roadmap</a>
-              <a href="#feedback" onClick={() => setMobileMenuOpen(false)}>Feedback</a>
+              <a href="#about" onClick={() => setMobileMenuOpen(false)}>About</a>
+              <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
+              <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
 
               <div className="flex flex-col gap-3 mt-4">
                 {isAuthenticated ? (

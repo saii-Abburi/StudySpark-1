@@ -42,8 +42,8 @@ const Footer = () => {
               Navigation
             </h4>
             <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-              <li><a href="#roadmap" className="hover:text-accent transition-colors">45-Day Plan</a></li>
-              <li><a href="#features" className="hover:text-accent transition-colors">AI Analysis</a></li>
+              <li><a href="#about" className="hover:text-accent transition-colors">About Us</a></li>
+              <li><a href="#features" className="hover:text-accent transition-colors">Features</a></li>
               <li><a href="#faq" className="hover:text-accent transition-colors">FAQ</a></li>
               <li><a href="#contact" className="hover:text-accent transition-colors">Contact</a></li>
             </ul>
