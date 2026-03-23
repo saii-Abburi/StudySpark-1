@@ -54,12 +54,17 @@ const userSchema = new mongoose.Schema(
     },
     
     targetExams: {
-      type: [{
+      type: [{ 
         name: { type: String, required: true, trim: true },
         date: { type: Date, required: true }
       }],
       validate: [val => val.length <= 3, '{PATH} exceeds the limit of 3']
     },
+
+    purchasedResources: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ResourceCard',
+    }],
   },
   { timestamps: true },
 );

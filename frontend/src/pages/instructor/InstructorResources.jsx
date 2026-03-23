@@ -1,332 +1,336 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
-import { 
-  Folder, FolderPlus, FileText, UploadCloud, Trash2, Pencil, 
-  ChevronRight, ArrowLeft, Plus, X, Loader, Check, FlaskConical, 
-  Calculator, Leaf, Bug, Atom, BookOpen
+import {
+  ChevronRight, ArrowLeft, Plus, Pencil, Trash2,
+  UploadCloud, Loader, Check, X, FolderPlus, FileText, BookOpen
 } from 'lucide-react';
 import { customToast } from '../../utils/toast';
 
-const STREAMS = {
-  engineering: {
-    label: 'Engineering',
-    color: 'border-l-blue-500',
-    accent: 'text-blue-400',
-    subjects: [
-      { key: 'maths-a', label: 'Maths A', icon: <Calculator className="w-8 h-8" /> },
-      { key: 'maths-b', label: 'Maths B', icon: <Calculator className="w-8 h-8" /> },
-      { key: 'physics', label: 'Physics', icon: <Atom className="w-8 h-8" /> },
-      { key: 'chemistry', label: 'Chemistry', icon: <FlaskConical className="w-8 h-8" /> },
-    ]
-  },
-  agriculture: {
-    label: 'Agriculture',
-    color: 'border-l-green-500',
-    accent: 'text-green-400',
-    subjects: [
-      { key: 'zoology', label: 'Zoology', icon: <Bug className="w-8 h-8" /> },
-      { key: 'botany', label: 'Botany', icon: <Leaf className="w-8 h-8" /> },
-      { key: 'physics', label: 'Physics', icon: <Atom className="w-8 h-8" /> },
-      { key: 'chemistry', label: 'Chemistry', icon: <FlaskConical className="w-8 h-8" /> },
-    ]
-  }
-};
+const EMOJI_OPTIONS = ['📄','📘','📗','📙','📝','🔬','📐','🧬','🌿','⚗️','🧪','📊','🗒️','📋'];
 
+// ── Generic inline-edit modal ──────────────────────────────────────────────
+function Modal({ title, value, onChange, onSave, onClose, saving, placeholder, extraField }) {
+  return (
+    <div className="fixed inset-0 bg-dark-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-dark-800 w-full max-w-md border border-dark-700 shadow-2xl">
+        <div className="px-6 py-4 border-b border-dark-700 bg-dark-900 flex justify-between items-center">
+          <h2 className="text-base font-black text-white uppercase tracking-wide">{title}</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+        </div>
+        <div className="p-6 space-y-4">
+          {extraField}
+          <input
+            type="text" autoFocus required
+            value={value} onChange={e => onChange(e.target.value)}
+            placeholder={placeholder || 'Name...'}
+            className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold"
+          />
+          <div className="flex justify-end gap-3">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-slate-300 border border-dark-700 font-bold text-xs uppercase tracking-widest hover:text-white hover:bg-dark-700 transition-colors">Cancel</button>
+            <button onClick={onSave} disabled={saving || !value.trim()} className="px-6 py-2.5 bg-primary-500 text-white font-bold text-xs uppercase tracking-widest hover:bg-primary-600 disabled:opacity-50 flex items-center gap-2 transition-colors">
+              {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Level-agnostic list panel ───────────────────────────────────────────────
+function ListPanel({ title, items, labelKey = 'name', onSelect, onAdd, addLabel, onEdit, onDelete, selected, iconKey }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-black text-white uppercase tracking-wide">{title}</h2>
+        <button onClick={onAdd} className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-colors">
+          <Plus className="w-4 h-4" /> {addLabel}
+        </button>
+      </div>
+      {items.length === 0 ? (
+        <div className="bg-dark-800 border border-dark-700 p-12 text-center">
+          <BookOpen className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Nothing here yet</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {items.map(item => (
+            <div
+              key={item._id}
+              onClick={() => onSelect(item)}
+              className={`group relative bg-dark-800 p-5 border-l-4 border-l-primary-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 hover:bg-dark-700 transition-all cursor-pointer ${selected?._id === item._id ? 'ring-1 ring-primary-500' : ''}`}
+            >
+              {iconKey && <span className="text-2xl mb-2 block">{item[iconKey]}</span>}
+              <p className="font-bold text-white text-sm uppercase tracking-wide pr-12">{item[labelKey] || item.title || item.name}</p>
+              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={e => { e.stopPropagation(); onEdit(item); }} className="p-1.5 text-slate-400 hover:text-primary-400"><Pencil className="w-3.5 h-3.5" /></button>
+                <button onClick={e => { e.stopPropagation(); onDelete(item); }} className="p-1.5 text-slate-400 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main Component ──────────────────────────────────────────────────────────
 export default function InstructorResources() {
-  const [selectedStream, setSelectedStream] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [selectedFolder, setSelectedFolder] = useState(null);
+  // Data state
+  const [streams, setStreams] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [chapters, setChapters] = useState([]);
+  const [files, setFiles] = useState([]);
 
-  const [folders, setFolders] = useState([]);
-  const [items, setItems] = useState([]);
-  const [loadingFolders, setLoadingFolders] = useState(false);
-  const [loadingItems, setLoadingItems] = useState(false);
+  // Selection state
+  const [stream, setStream] = useState(null);
+  const [subject, setSubject] = useState(null);
+  const [card, setCard] = useState(null);
+  const [chapter, setChapter] = useState(null);
 
-  // Folder create/edit state
-  const [showFolderModal, setShowFolderModal] = useState(false);
-  const [editingFolder, setEditingFolder] = useState(null);
-  const [folderName, setFolderName] = useState('');
-  const [savingFolder, setSavingFolder] = useState(false);
+  // Modal state
+  const [modal, setModal] = useState(null); // { type, editing }
+  const [modalValue, setModalValue] = useState('');
+  const [modalIcon, setModalIcon] = useState('📄');
+  const [modalIsPremium, setModalIsPremium] = useState(false);
+  const [modalPrice, setModalPrice] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  // Item upload state
-  const [showItemModal, setShowItemModal] = useState(false);
-  const [uploadMode, setUploadMode] = useState('file'); // 'file' | 'url'
-  const [itemTitle, setItemTitle] = useState('');
-  const [itemUrl, setItemUrl] = useState('');
-  const [itemType, setItemType] = useState('pdf');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadingItem, setUploadingItem] = useState(false);
+  // Upload state
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploadTitle, setUploadTitle] = useState('');
+  const [uploadMode, setUploadMode] = useState('file');
+  const [uploadUrl, setUploadUrl] = useState('');
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadIsFreePreview, setUploadIsFreePreview] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
 
-  // ─── Navigation helpers ───────────────────────────
-  const loadFolders = async (stream, subject) => {
-    setLoadingFolders(true);
-    try {
-      const res = await api.get('/resources/folders', { params: { stream: stream.key || stream, subject: subject.key } });
-      setFolders(res.data.folders || []);
-    } catch { setFolders([]); }
-    finally { setLoadingFolders(false); }
+  // Loading
+  const [loading, setLoading] = useState(false);
+
+  // ── Loaders ──────────────────────────────────────────────
+  useEffect(() => { fetchStreams(); }, []);
+
+  const fetchStreams = async () => {
+    try { const r = await api.get('/resources/streams'); setStreams(r.data.streams); } catch {}
+  };
+  const fetchSubjects = async (streamId) => {
+    setLoading(true);
+    try { const r = await api.get('/resources/subjects', { params: { streamId } }); setSubjects(r.data.subjects); } catch {}
+    setLoading(false);
+  };
+  const fetchCards = async (subjectId) => {
+    setLoading(true);
+    try { const r = await api.get('/resources/cards', { params: { subjectId } }); setCards(r.data.cards); } catch {}
+    setLoading(false);
+  };
+  const fetchChapters = async (cardId) => {
+    setLoading(true);
+    try { const r = await api.get('/resources/chapters', { params: { cardId } }); setChapters(r.data.chapters); } catch {}
+    setLoading(false);
+  };
+  const fetchFiles = async (chapterId) => {
+    setLoading(true);
+    try { const r = await api.get('/resources/files', { params: { chapterId } }); setFiles(r.data.files); } catch {}
+    setLoading(false);
   };
 
-  const loadItems = async (folder) => {
-    setLoadingItems(true);
-    try {
-      const res = await api.get(`/resources/items/${folder._id}`);
-      setItems(res.data.items || []);
-    } catch { setItems([]); }
-    finally { setLoadingItems(false); }
-  };
-
-  const handleSubjectClick = (subject) => {
-    setSelectedSubject(subject);
-    setSelectedFolder(null);
-    loadFolders(selectedStream, subject);
-  };
-
-  const handleFolderClick = (folder) => {
-    setSelectedFolder(folder);
-    loadItems(folder);
-  };
+  // ── Navigation ────────────────────────────────────────────
+  const selectStream = (s) => { setStream(s); setSubject(null); setCard(null); setChapter(null); fetchSubjects(s._id); };
+  const selectSubject = (s) => { setSubject(s); setCard(null); setChapter(null); fetchCards(s._id); };
+  const selectCard = (c) => { setCard(c); setChapter(null); fetchChapters(c._id); };
+  const selectChapter = (c) => { setChapter(c); fetchFiles(c._id); };
 
   const goBack = () => {
-    if (selectedFolder) { setSelectedFolder(null); return; }
-    if (selectedSubject) { setSelectedSubject(null); setFolders([]); return; }
-    if (selectedStream) { setSelectedStream(null); return; }
+    if (chapter) { setChapter(null); return; }
+    if (card) { setCard(null); return; }
+    if (subject) { setSubject(null); return; }
+    if (stream) { setStream(null); return; }
   };
 
-  // ─── Folder CRUD ──────────────────────────────────
-  const openCreateFolder = () => { setEditingFolder(null); setFolderName(''); setShowFolderModal(true); };
-  const openEditFolder = (folder, e) => { e.stopPropagation(); setEditingFolder(folder); setFolderName(folder.name); setShowFolderModal(true); };
+  // ── CRUD helpers ─────────────────────────────────────────
+  const openCreate = (type) => { 
+    setModal({ type, editing: null }); 
+    setModalValue(''); 
+    setModalIcon('📄'); 
+    setModalIsPremium(false);
+    setModalPrice('');
+  };
+  const openEdit = (type, item) => { 
+    setModal({ type, editing: item }); 
+    setModalValue(item.name || item.title || ''); 
+    setModalIcon(item.icon || '📄'); 
+    setModalIsPremium(item.isPremium || false);
+    setModalPrice(item.price || '');
+  };
 
-  const handleSaveFolder = async (e) => {
-    e.preventDefault();
-    if (!folderName.trim()) return;
-    setSavingFolder(true);
+  const openUpload = () => {
+    setShowUpload(true);
+    setUploadTitle('');
+    setUploadUrl('');
+    setUploadFile(null);
+    setUploadIsFreePreview(false);
+  };
+
+  const handleSave = async () => {
+    if (!modalValue.trim()) return;
+    setSaving(true);
     try {
-      if (editingFolder) {
-        const res = await api.put(`/resources/instructor/folders/${editingFolder._id}`, { name: folderName });
-        setFolders(prev => prev.map(f => f._id === editingFolder._id ? res.data.folder : f));
-        customToast.success('Folder renamed!');
-      } else {
-        const res = await api.post('/resources/instructor/folders', {
-          stream: selectedStream,
-          subject: selectedSubject.key,
-          name: folderName,
-        });
-        setFolders(prev => [...prev, res.data.folder]);
-        customToast.success('Folder created!');
-      }
-      setShowFolderModal(false);
-    } catch (err) {
-      customToast.error(err.response?.data?.error || 'Failed to save folder');
-    } finally { setSavingFolder(false); }
+      const { type, editing } = modal;
+      const url = editing ? `/resources/${type}s/${editing._id}` : `/resources/${type}s`;
+      const payload = type === 'stream' ? { name: modalValue }
+        : type === 'subject' ? { name: modalValue, streamId: stream._id }
+        : type === 'card' ? { title: modalValue, icon: modalIcon, subjectId: subject._id, isPremium: modalIsPremium, price: modalPrice }
+        : /* chapter */ { title: modalValue, cardId: card._id };
+
+      const method = editing ? 'put' : 'post';
+      const r = await api[method](url, payload);
+
+      const keyMap = { stream: 'stream', subject: 'subject', card: 'card', chapter: 'chapter' };
+      const newItem = r.data[keyMap[type]];
+
+      if (type === 'stream') editing ? setStreams(p => p.map(x => x._id === editing._id ? newItem : x)) : setStreams(p => [...p, newItem]);
+      if (type === 'subject') editing ? setSubjects(p => p.map(x => x._id === editing._id ? newItem : x)) : setSubjects(p => [...p, newItem]);
+      if (type === 'card') editing ? setCards(p => p.map(x => x._id === editing._id ? newItem : x)) : setCards(p => [...p, newItem]);
+      if (type === 'chapter') editing ? setChapters(p => p.map(x => x._id === editing._id ? newItem : x)) : setChapters(p => [...p, newItem]);
+
+      customToast.success(`${type} ${editing ? 'updated' : 'created'}!`);
+      setModal(null);
+    } catch (err) { customToast.error(err.response?.data?.error || 'Failed'); }
+    setSaving(false);
   };
 
-  const handleDeleteFolder = async (folder, e) => {
-    e.stopPropagation();
-    if (!window.confirm(`Delete folder "${folder.name}" and ALL its contents? This cannot be undone.`)) return;
+  const handleDelete = async (type, item) => {
+    if (!window.confirm(`Delete "${item.name || item.title}"? This will delete all nested content.`)) return;
     try {
-      await api.delete(`/resources/instructor/folders/${folder._id}`);
-      setFolders(prev => prev.filter(f => f._id !== folder._id));
-      if (selectedFolder?._id === folder._id) setSelectedFolder(null);
-      customToast.success('Folder deleted.');
-    } catch {
-      customToast.error('Failed to delete folder.');
-    }
+      await api.delete(`/resources/${type}s/${item._id}`);
+      if (type === 'stream') { setStreams(p => p.filter(x => x._id !== item._id)); if (stream?._id === item._id) setStream(null); }
+      if (type === 'subject') { setSubjects(p => p.filter(x => x._id !== item._id)); if (subject?._id === item._id) setSubject(null); }
+      if (type === 'card') { setCards(p => p.filter(x => x._id !== item._id)); if (card?._id === item._id) setCard(null); }
+      if (type === 'chapter') { setChapters(p => p.filter(x => x._id !== item._id)); if (chapter?._id === item._id) setChapter(null); }
+      customToast.success('Deleted.');
+    } catch { customToast.error('Delete failed.'); }
   };
 
-  // ─── Item Upload ──────────────────────────────────
-  const openUploadModal = () => {
-    setItemTitle(''); setItemUrl(''); setItemType('pdf'); setSelectedFile(null); setUploadMode('file');
-    setShowItemModal(true);
+  const handleDeleteFile = async (file) => {
+    if (!window.confirm(`Delete "${file.title}"?`)) return;
+    try {
+      await api.delete(`/resources/files/${file._id}`);
+      setFiles(p => p.filter(f => f._id !== file._id));
+      customToast.success('File deleted.');
+    } catch { customToast.error('Delete failed.'); }
   };
 
-  const handleUploadItem = async (e) => {
+  const handleUpload = async (e) => {
     e.preventDefault();
-    if (!itemTitle.trim()) return customToast.error('Title is required');
-    if (uploadMode === 'url' && !itemUrl.trim()) return customToast.error('URL is required');
-    if (uploadMode === 'file' && !selectedFile) return customToast.error('Please select a file');
+    if (!uploadTitle.trim()) return customToast.error('Title is required');
+    if (uploadMode === 'url' && !uploadUrl.trim()) return customToast.error('URL is required');
+    if (uploadMode === 'file' && !uploadFile) return customToast.error('Select a file');
 
-    setUploadingItem(true);
+    setUploading(true);
     try {
       const data = new FormData();
-      data.append('folderId', selectedFolder._id);
-      data.append('title', itemTitle);
-      data.append('type', itemType);
-      if (uploadMode === 'url') data.append('url', itemUrl);
-      if (uploadMode === 'file') data.append('file', selectedFile);
-
-      const res = await api.post('/resources/instructor/items', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      setItems(prev => [...prev, res.data.item]);
-      customToast.success('Resource uploaded!');
-      setShowItemModal(false);
-    } catch (err) {
-      customToast.error(err.response?.data?.error || 'Upload failed');
-    } finally { setUploadingItem(false); }
+      data.append('title', uploadTitle); data.append('chapterId', chapter._id);
+      data.append('isFreePreview', uploadIsFreePreview);
+      if (uploadMode === 'url') { data.append('fileUrl', uploadUrl); data.append('fileType', 'link'); }
+      else { data.append('file', uploadFile); data.append('fileType', 'pdf'); }
+      const r = await api.post('/resources/files', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setFiles(p => [...p, r.data.file]);
+      customToast.success('Uploaded!');
+      setShowUpload(false); setUploadTitle(''); setUploadUrl(''); setUploadFile(null);
+    } catch (err) { customToast.error(err.response?.data?.error || 'Upload failed'); }
+    setUploading(false);
   };
 
-  const handleDeleteItem = async (item) => {
-    if (!window.confirm(`Delete "${item.title}"?`)) return;
-    try {
-      await api.delete(`/resources/instructor/items/${item._id}`);
-      setItems(prev => prev.filter(i => i._id !== item._id));
-      customToast.success('Item deleted.');
-    } catch { customToast.error('Failed to delete item.'); }
-  };
-
-  // ─── Render ──────────────────────────────────────
-  const streamData = selectedStream ? STREAMS[selectedStream] : null;
+  // ── Level label ───────────────────────────────────────────
+  const level = chapter ? 'files' : card ? 'chapters' : subject ? 'cards' : stream ? 'subjects' : 'streams';
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-4">
-          {selectedStream && (
-            <button onClick={goBack} className="p-2 text-slate-400 hover:text-white border border-dark-700 hover:border-primary-500 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-          )}
-          <div>
-            <h1 className="text-3xl font-black text-white uppercase flex items-center tracking-tight">
-              <span className="w-8 h-1 bg-primary-500 mr-3"></span>
-              Materials Manager
-            </h1>
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
-              <span className={selectedStream ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => { setSelectedStream(null); setSelectedSubject(null); setSelectedFolder(null); }}>All Streams</span>
-              {selectedStream && <><ChevronRight className="w-3 h-3" /><span className={selectedSubject ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => { setSelectedSubject(null); setSelectedFolder(null); }}>{streamData?.label}</span></>}
-              {selectedSubject && <><ChevronRight className="w-3 h-3" /><span className={selectedFolder ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => setSelectedFolder(null)}>{selectedSubject.label}</span></>}
-              {selectedFolder && <><ChevronRight className="w-3 h-3" /><span className="text-white">{selectedFolder.name}</span></>}
-            </div>
+      {/* Header + Breadcrumb */}
+      <div className="flex flex-wrap items-center gap-4">
+        {stream && (
+          <button onClick={goBack} className="p-2 text-slate-400 hover:text-white border border-dark-700 hover:border-primary-500 transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        )}
+        <div>
+          <h1 className="text-2xl font-black text-white uppercase tracking-tight flex items-center">
+            <span className="w-6 h-1 bg-primary-500 mr-3"></span>Materials Manager
+          </h1>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold uppercase tracking-widest text-slate-400 mt-1">
+            <span className={stream ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => { setStream(null); setSubject(null); setCard(null); setChapter(null); }}>Streams</span>
+            {stream && <><ChevronRight className="w-3 h-3" /><span className={subject ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => { setSubject(null); setCard(null); setChapter(null); }}>{stream.name}</span></>}
+            {subject && <><ChevronRight className="w-3 h-3" /><span className={card ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => { setCard(null); setChapter(null); }}>{subject.name}</span></>}
+            {card && <><ChevronRight className="w-3 h-3" /><span className={chapter ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => setChapter(null)}>{card.title}</span></>}
+            {chapter && <><ChevronRight className="w-3 h-3" /><span className="text-white">{chapter.title}</span></>}
           </div>
-        </div>
-
-        {/* Context actions */}
-        <div className="flex gap-3">
-          {selectedSubject && !selectedFolder && (
-            <button onClick={openCreateFolder} className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-colors">
-              <FolderPlus className="w-4 h-4" /> New Folder
-            </button>
-          )}
-          {selectedFolder && (
-            <button onClick={openUploadModal} className="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-colors">
-              <UploadCloud className="w-4 h-4" /> Upload Resource
-            </button>
-          )}
         </div>
       </div>
 
-      {/* ── Level 1: Stream Selector ── */}
-      {!selectedStream && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {Object.entries(STREAMS).map(([key, s]) => (
-            <button key={key} onClick={() => setSelectedStream(key)}
-              className={`group bg-dark-800 p-8 border-l-4 ${s.color} border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 text-left hover:bg-dark-700 transition-all`}>
-              <BookOpen className="w-10 h-10 text-primary-500 mb-4" />
-              <h2 className="text-2xl font-black text-white uppercase tracking-wide">{s.label}</h2>
-              <p className="text-slate-400 text-sm mt-2">{s.subjects.length} subjects</p>
-              <div className="flex items-center text-primary-500 text-xs font-bold uppercase tracking-widest mt-6">
-                Manage <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </button>
-          ))}
-        </div>
+      {loading && <div className="text-center text-slate-400 py-8 text-xs font-bold uppercase tracking-widest">Loading...</div>}
+
+      {/* ── Streams ── */}
+      {!stream && !loading && (
+        <ListPanel title="Streams" items={streams} labelKey="name"
+          onSelect={selectStream} onAdd={() => openCreate('stream')} addLabel="New Stream"
+          onEdit={item => openEdit('stream', item)} onDelete={item => handleDelete('stream', item)} />
       )}
 
-      {/* ── Level 2: Subject selector ── */}
-      {selectedStream && !selectedSubject && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {streamData.subjects.map(subject => (
-            <button key={subject.key} onClick={() => handleSubjectClick(subject)}
-              className={`group bg-dark-800 p-8 border-l-4 ${streamData.color} border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 text-left hover:bg-dark-700 transition-all flex flex-col items-start`}>
-              <div className={`${streamData.accent} mb-4`}>{subject.icon}</div>
-              <h3 className="font-black text-white text-lg uppercase tracking-wide">{subject.label}</h3>
-              <div className="flex items-center text-primary-500 text-xs font-bold uppercase tracking-widest mt-4">
-                Manage <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </button>
-          ))}
-        </div>
+      {/* ── Subjects ── */}
+      {stream && !subject && !loading && (
+        <ListPanel title={`${stream.name} — Subjects`} items={subjects} labelKey="name"
+          onSelect={selectSubject} onAdd={() => openCreate('subject')} addLabel="New Subject"
+          onEdit={item => openEdit('subject', item)} onDelete={item => handleDelete('subject', item)} />
       )}
 
-      {/* ── Level 3: Folders ── */}
-      {selectedSubject && !selectedFolder && (
+      {/* ── Resource Cards ── */}
+      {subject && !card && !loading && (
+        <ListPanel title={`${subject.name} — Resource Cards`} items={cards} labelKey="title" iconKey="icon"
+          onSelect={selectCard} onAdd={() => openCreate('card')} addLabel="New Card"
+          onEdit={item => openEdit('card', item)} onDelete={item => handleDelete('card', item)} />
+      )}
+
+      {/* ── Chapters ── */}
+      {card && !chapter && !loading && (
+        <ListPanel title={`${card.title} — Chapters`} items={chapters} labelKey="title"
+          onSelect={selectChapter} onAdd={() => openCreate('chapter')} addLabel="New Chapter"
+          onEdit={item => openEdit('chapter', item)} onDelete={item => handleDelete('chapter', item)} />
+      )}
+
+      {/* ── Files ── */}
+      {chapter && !loading && (
         <div className="space-y-4">
-          <h2 className="text-lg font-black text-white uppercase tracking-wide">{selectedSubject.label} — Folders</h2>
-          {loadingFolders ? <div className="text-center text-slate-400 py-12 text-sm font-bold uppercase tracking-widest">Loading...</div> : folders.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 p-16 text-center">
-              <Folder className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No folders yet</p>
-              <button onClick={openCreateFolder} className="mt-6 px-6 py-3 bg-primary-500 text-white font-bold text-xs uppercase tracking-widest hover:bg-primary-600 transition-colors">
-                Create First Folder
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {folders.map(folder => (
-                <div key={folder._id} onClick={() => handleFolderClick(folder)}
-                  className="group bg-dark-800 p-6 border-l-4 border-l-amber-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 hover:bg-dark-700 transition-all cursor-pointer relative">
-                  <Folder className="w-8 h-8 text-amber-500 mb-3" />
-                  <h3 className="font-bold text-white text-sm uppercase tracking-wide">{folder.name}</h3>
-                  <div className="flex items-center gap-2 absolute top-4 right-4">
-                    <button onClick={(e) => openEditFolder(folder, e)} className="p-1.5 text-slate-500 hover:text-primary-400 transition-colors">
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button onClick={(e) => handleDeleteFolder(folder, e)} className="p-1.5 text-slate-500 hover:text-red-500 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Level 4: Items ── */}
-      {selectedFolder && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-black text-white uppercase tracking-wide">{selectedFolder.name} — Resources</h2>
-          {loadingItems ? <div className="text-center text-slate-400 py-12 text-sm font-bold uppercase tracking-widest">Loading...</div> : items.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 p-16 text-center">
-              <FileText className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No resources yet</p>
-              <button onClick={openUploadModal} className="mt-6 px-6 py-3 bg-primary-500 text-white font-bold text-xs uppercase tracking-widest hover:bg-primary-600 transition-colors">
-                Upload First Resource
-              </button>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-black text-white uppercase tracking-wide">{chapter.title} — Files</h2>
+            <button onClick={() => setShowUpload(true)} className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-colors">
+              <UploadCloud className="w-4 h-4" /> Upload File
+            </button>
+          </div>
+          {files.length === 0 ? (
+            <div className="bg-dark-800 border border-dark-700 p-12 text-center">
+              <FileText className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No files yet</p>
             </div>
           ) : (
             <div className="bg-dark-800 border border-dark-700 overflow-hidden">
-              <table className="w-full text-left text-sm text-slate-200">
-                <thead className="text-xs font-bold uppercase tracking-widest bg-dark-900 border-b border-dark-700 text-slate-300">
-                  <tr>
-                    <th className="px-6 py-4">Title</th>
-                    <th className="px-6 py-4">Type</th>
-                    <th className="px-6 py-4">Date</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
-                  </tr>
+              <table className="w-full text-left text-sm">
+                <thead className="text-xs font-bold uppercase tracking-widest bg-dark-900 border-b border-dark-700 text-slate-400">
+                  <tr><th className="px-5 py-3">Title</th><th className="px-5 py-3">Type</th><th className="px-5 py-3">Date</th><th className="px-5 py-3 text-right">Delete</th></tr>
                 </thead>
                 <tbody>
-                  {items.map(item => (
-                    <tr key={item._id} className="border-b border-dark-700 hover:bg-dark-900/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-primary-500 shrink-0" />
-                          <span className="font-bold text-white">{item.title}</span>
-                        </div>
+                  {files.map(f => (
+                    <tr key={f._id} className="border-b border-dark-700 hover:bg-dark-700/50">
+                      <td className="px-5 py-3 font-bold text-white flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-primary-500 shrink-0" />
+                        {f.title}
+                        {f.isFreePreview && <span className="ml-2 text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 px-1.5 py-0.5 font-black uppercase tracking-tighter">Free Preview</span>}
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 bg-primary-500/10 text-primary-400 border border-primary-500/20 text-xs font-bold uppercase tracking-widest">{item.type}</span>
-                      </td>
-                      <td className="px-6 py-4 text-xs text-slate-400 font-bold uppercase tracking-widest">{new Date(item.createdAt).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => handleDeleteItem(item)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
+                      <td className="px-5 py-3"><span className="px-2 py-0.5 bg-primary-500/10 text-primary-400 border border-primary-500/20 text-xs font-bold uppercase">{f.fileType}</span></td>
+                      <td className="px-5 py-3 text-xs text-slate-400 font-bold uppercase tracking-widest">{new Date(f.createdAt).toLocaleDateString()}</td>
+                      <td className="px-5 py-3 text-right"><button onClick={() => handleDeleteFile(f)} className="p-2 text-slate-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -336,106 +340,89 @@ export default function InstructorResources() {
         </div>
       )}
 
-      {/* ── Folder Create/Edit Modal ── */}
-      {showFolderModal && (
-        <div className="fixed inset-0 bg-dark-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-800 w-full max-w-md border border-dark-700 shadow-2xl">
-            <div className="px-6 py-5 border-b border-dark-700 bg-dark-900 flex justify-between items-center">
-              <h2 className="text-lg font-black text-white uppercase tracking-wide">{editingFolder ? 'Rename Folder' : 'New Folder'}</h2>
-              <button onClick={() => setShowFolderModal(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
-            </div>
-            <form onSubmit={handleSaveFolder} className="p-6 space-y-4">
+      {/* ── Create/Edit Modal ── */}
+      {modal && (
+        <Modal
+          title={`${modal.editing ? 'Edit' : 'New'} ${modal.type}`}
+          value={modalValue}
+          onChange={setModalValue}
+          onSave={handleSave}
+          onClose={() => setModal(null)}
+          saving={saving}
+          placeholder={modal.type === 'card' ? 'e.g. Revision Notes' : modal.type === 'chapter' ? 'e.g. Animal Kingdom' : `${modal.type} name...`}
+          extraField={modal.type === 'card' && (
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Folder Name</label>
-                <input
-                  type="text" required autoFocus
-                  value={folderName}
-                  onChange={e => setFolderName(e.target.value)}
-                  placeholder="e.g. Revision Notes, Handwritten Notes..."
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold"
-                />
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Icon (optional)</label>
+                <div className="flex flex-wrap gap-2">
+                  {EMOJI_OPTIONS.map(e => (
+                    <button key={e} type="button" onClick={() => setModalIcon(e)}
+                      className={`text-xl p-1.5 rounded border ${modalIcon === e ? 'border-primary-500 bg-primary-500/10' : 'border-dark-700 bg-dark-900 hover:border-dark-500'}`}>{e}</button>
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setShowFolderModal(false)} className="px-5 py-2.5 text-slate-300 border border-dark-700 font-bold text-xs uppercase tracking-widest hover:text-white hover:bg-dark-700 transition-colors">Cancel</button>
-                <button type="submit" disabled={savingFolder} className="px-6 py-2.5 bg-primary-500 text-white font-bold text-xs uppercase tracking-widest hover:bg-primary-600 disabled:opacity-50 flex items-center gap-2 transition-colors">
-                  {savingFolder ? <Loader className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  {editingFolder ? 'Save' : 'Create'}
-                </button>
+              <div className="flex items-center gap-4 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div className={`w-10 h-5 rounded-full relative transition-colors ${modalIsPremium ? 'bg-primary-500' : 'bg-dark-700'}`} onClick={() => setModalIsPremium(!modalIsPremium)}>
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${modalIsPremium ? 'left-6' : 'left-1'}`}></div>
+                  </div>
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Premium Card</span>
+                </label>
+                {modalIsPremium && (
+                  <div className="flex-1">
+                    <input 
+                      type="number" 
+                      placeholder="Price" 
+                      value={modalPrice} 
+                      onChange={e => setModalPrice(e.target.value)}
+                      className="w-full px-3 py-1.5 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold text-sm"
+                    />
+                  </div>
+                )}
               </div>
-            </form>
-          </div>
-        </div>
+            </div>
+          )}
+        />
       )}
 
-      {/* ── Item Upload Modal ── */}
-      {showItemModal && (
+      {/* ── Upload File Modal ── */}
+      {showUpload && (
         <div className="fixed inset-0 bg-dark-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-800 w-full max-w-lg border border-dark-700 shadow-2xl max-h-[90vh] flex flex-col">
-            <div className="px-6 py-5 border-b border-dark-700 bg-dark-900 flex justify-between items-center shrink-0">
-              <h2 className="text-lg font-black text-white uppercase tracking-wide flex items-center gap-2">
-                <UploadCloud className="w-5 h-5 text-primary-500" /> Upload Resource
-              </h2>
-              <button onClick={() => setShowItemModal(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+          <div className="bg-dark-800 w-full max-w-lg border border-dark-700 shadow-2xl">
+            <div className="px-6 py-4 border-b border-dark-700 bg-dark-900 flex justify-between items-center">
+              <h2 className="text-base font-black text-white uppercase tracking-wide flex items-center gap-2"><UploadCloud className="w-5 h-5 text-primary-500" />Upload Resource</h2>
+              <button onClick={() => setShowUpload(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleUploadItem} className="p-6 space-y-5 overflow-y-auto">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Resource Title *</label>
-                <input type="text" required value={itemTitle} onChange={e => setItemTitle(e.target.value)} placeholder="e.g. Chapter 1 – Animal Kingdom"
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold" />
+            <form onSubmit={handleUpload} className="p-6 space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">File Title *</label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={uploadIsFreePreview} onChange={e => setUploadIsFreePreview(e.target.checked)} className="rounded border-dark-700 bg-dark-900 text-primary-500 focus:ring-primary-500" />
+                  <span className="text-[10px] font-black text-green-400 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 border border-green-500/20">Free Preview</span>
+                </label>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Resource Type</label>
-                  <select value={itemType} onChange={e => setItemType(e.target.value)}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold text-xs uppercase tracking-widest">
-                    <option value="pdf">PDF</option>
-                    <option value="link">External Link</option>
-                    <option value="video">Video</option>
-                    <option value="image">Image</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Upload Mode</label>
-                  <div className="flex">
-                    <button type="button" onClick={() => setUploadMode('file')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest border transition-colors ${uploadMode === 'file' ? 'bg-primary-500 text-white border-primary-500' : 'bg-dark-900 border-dark-700 text-slate-400 hover:text-white'}`}>
-                      File
-                    </button>
-                    <button type="button" onClick={() => setUploadMode('url')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest border-t border-b border-r transition-colors ${uploadMode === 'url' ? 'bg-primary-500 text-white border-primary-500' : 'bg-dark-900 border-dark-700 text-slate-400 hover:text-white'}`}>
-                      URL
-                    </button>
-                  </div>
-                </div>
+              <input type="text" required value={uploadTitle} onChange={e => setUploadTitle(e.target.value)} placeholder="e.g. Chapter 1 – Animal Kingdom"
+                className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold" />
+              <div className="flex">
+                <button type="button" onClick={() => setUploadMode('file')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-widest border transition-colors ${uploadMode === 'file' ? 'bg-primary-500 text-white border-primary-500' : 'bg-dark-900 border-dark-700 text-slate-400 hover:text-white'}`}>Upload File</button>
+                <button type="button" onClick={() => setUploadMode('url')} className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-widest border-t border-b border-r transition-colors ${uploadMode === 'url' ? 'bg-primary-500 text-white border-primary-500' : 'bg-dark-900 border-dark-700 text-slate-400 hover:text-white'}`}>Paste URL</button>
               </div>
-
               {uploadMode === 'url' ? (
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Resource URL *</label>
-                  <input type="url" value={itemUrl} onChange={e => setItemUrl(e.target.value)} placeholder="https://drive.google.com/..."
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold" />
-                </div>
+                <input type="url" value={uploadUrl} onChange={e => setUploadUrl(e.target.value)} placeholder="https://..."
+                  className="w-full px-4 py-3 bg-dark-900 border border-dark-700 focus:outline-none focus:border-primary-500 text-white font-bold" />
               ) : (
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Upload File *</label>
-                  <div className="border border-dashed border-dark-600 p-8 bg-dark-900 hover:bg-dark-800 transition-colors text-center">
-                    <input type="file" accept=".pdf,image/*,video/*" ref={fileRef} className="hidden" id="item-file"
-                      onChange={e => setSelectedFile(e.target.files[0])} />
-                    <label htmlFor="item-file" className="cursor-pointer flex flex-col items-center gap-3">
-                      <UploadCloud className="w-8 h-8 text-primary-500" />
-                      {selectedFile ? (
-                        <span className="text-green-400 font-bold text-sm">{selectedFile.name}</span>
-                      ) : (
-                        <span className="text-primary-500 font-bold text-sm uppercase tracking-widest">Click to browse files</span>
-                      )}
-                    </label>
-                  </div>
+                <div className="border border-dashed border-dark-600 p-6 bg-dark-900 text-center">
+                  <input type="file" accept=".pdf,image/*" ref={fileRef} className="hidden" id="res-file" onChange={e => setUploadFile(e.target.files[0])} />
+                  <label htmlFor="res-file" className="cursor-pointer flex flex-col items-center gap-2">
+                    <UploadCloud className="w-7 h-7 text-primary-500" />
+                    {uploadFile ? <span className="text-green-400 font-bold text-sm">{uploadFile.name}</span> : <span className="text-primary-500 font-bold text-sm uppercase tracking-widest">Click to browse</span>}
+                  </label>
                 </div>
               )}
-
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setShowItemModal(false)} className="px-5 py-2.5 text-slate-300 border border-dark-700 font-bold text-xs uppercase tracking-widest hover:text-white hover:bg-dark-700 transition-colors">Cancel</button>
-                <button type="submit" disabled={uploadingItem} className="px-6 py-2.5 bg-primary-500 text-white font-bold text-xs uppercase tracking-widest hover:bg-primary-600 disabled:opacity-50 flex items-center gap-2 transition-colors">
-                  {uploadingItem ? <><Loader className="w-4 h-4 animate-spin" /> Uploading...</> : <><UploadCloud className="w-4 h-4" /> Upload</>}
+                <button type="button" onClick={() => setShowUpload(false)} className="px-5 py-2.5 text-slate-300 border border-dark-700 font-bold text-xs uppercase tracking-widest hover:text-white hover:bg-dark-700 transition-colors">Cancel</button>
+                <button type="submit" disabled={uploading} className="px-6 py-2.5 bg-primary-500 text-white font-bold text-xs uppercase tracking-widest hover:bg-primary-600 disabled:opacity-50 flex items-center gap-2 transition-colors">
+                  {uploading ? <><Loader className="w-4 h-4 animate-spin" />Uploading...</> : <><UploadCloud className="w-4 h-4" />Upload</>}
                 </button>
               </div>
             </form>

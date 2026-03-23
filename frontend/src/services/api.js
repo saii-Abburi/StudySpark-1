@@ -15,11 +15,12 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle unauthorized errors (e.g., redirect to login)
-    if (error.response && error.response.status === 401) {
-      console.log('Unauthorized, redirecting to login...');
+    // Handle unauthorized errors — but NOT during logout (it's intentional)
+    const isLogout = error.config?.url?.includes('/logout');
+    if (!isLogout && error.response && error.response.status === 401) {
+      console.log('Unauthorized, redirecting to home...');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

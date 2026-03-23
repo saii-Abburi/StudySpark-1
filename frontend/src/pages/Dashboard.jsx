@@ -33,10 +33,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const [mockExpanded, setMockExpanded] = useState(false);
   const [chapterExpanded, setChapterExpanded] = useState(false);
   const [materialsExpanded, setMaterialsExpanded] = useState(false);
+
   
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const navItems = [
@@ -129,28 +130,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                   {item.name}
                 </Link>
                 
-                {/* Inject expandable sub-nav for Materials & Resources */}
-                {item.expandable && (
-                  <div className="pl-12 pr-4 space-y-1 -mt-1 border-l-2 border-dark-800 ml-6">
-                    <button
-                      onClick={() => setMaterialsExpanded(!materialsExpanded)}
-                      className="w-full flex items-center justify-between py-2 text-sm text-slate-200 hover:text-white transition-colors"
-                    >
-                      <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Streams</span>
-                      <Plus 
-                        className={`h-3 w-3 transition-transform duration-300 ease-in-out ${
-                          materialsExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-400'
-                        }`} 
-                      />
-                    </button>
-                    {materialsExpanded && (
-                      <div className="pl-4 space-y-1 mb-2">
-                        <Link to="/dashboard/materials/engineering" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Engineering</Link>
-                        <Link to="/dashboard/materials/agriculture" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Agriculture</Link>
-                      </div>
-                    )}
-                  </div>
-                )}
+                {/* Removed expandable sub-nav for Materials & Resources as requested */}
+
                 {/* Inject Tests immediately after Overview for students */}
                 {item.name === 'Overview' && user?.role === 'student' && (
                   <div className="pt-2 pb-2 block border-b border-dark-800/50 mb-2">
@@ -439,7 +420,7 @@ export default function Dashboard() {
 
               {/* Shared Routes */}
               <Route path="/materials" element={<ResourcesComponent />} />
-              <Route path="/materials/:stream" element={<ResourcesComponent />} />
+              <Route path="/materials/:streamId" element={<ResourcesComponent />} />
               <Route path="/settings" element={<SettingsArea />} />
               
               {/* Catch-all route to redirect unauthorized access to overview */}
