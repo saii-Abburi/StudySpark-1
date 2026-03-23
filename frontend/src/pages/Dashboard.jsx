@@ -32,6 +32,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const [testsExpanded, setTestsExpanded] = useState(false);
   const [mockExpanded, setMockExpanded] = useState(false);
   const [chapterExpanded, setChapterExpanded] = useState(false);
+  const [materialsExpanded, setMaterialsExpanded] = useState(false);
   
   const handleLogout = async () => {
     await logout();
@@ -47,7 +48,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       { name: 'Bookmarks', path: '/dashboard/bookmarks', icon: <BookMarked className="h-5 w-5" /> },
     ] : []),
 
-    { name: 'My Materials', path: '/dashboard/materials', icon: <Library className="h-5 w-5" /> },
+    { name: 'Materials & Resources', path: '/dashboard/materials', icon: <Library className="h-5 w-5" />, expandable: true },
     
     // Instructor specific routes
     ...(user?.role === 'instructor' || user?.role === 'admin' ? [
@@ -128,6 +129,28 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                   {item.name}
                 </Link>
                 
+                {/* Inject expandable sub-nav for Materials & Resources */}
+                {item.expandable && (
+                  <div className="pl-12 pr-4 space-y-1 -mt-1 border-l-2 border-dark-800 ml-6">
+                    <button
+                      onClick={() => setMaterialsExpanded(!materialsExpanded)}
+                      className="w-full flex items-center justify-between py-2 text-sm text-slate-200 hover:text-white transition-colors"
+                    >
+                      <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Streams</span>
+                      <Plus 
+                        className={`h-3 w-3 transition-transform duration-300 ease-in-out ${
+                          materialsExpanded ? 'rotate-[225deg] text-primary-500' : 'rotate-0 text-slate-400'
+                        }`} 
+                      />
+                    </button>
+                    {materialsExpanded && (
+                      <div className="pl-4 space-y-1 mb-2">
+                        <Link to="/dashboard/materials/engineering" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Engineering</Link>
+                        <Link to="/dashboard/materials/agriculture" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Agriculture</Link>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {/* Inject Tests immediately after Overview for students */}
                 {item.name === 'Overview' && user?.role === 'student' && (
                   <div className="pt-2 pb-2 block border-b border-dark-800/50 mb-2">
@@ -162,7 +185,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                         </button>
                         {mockExpanded && (
                           <div className="pl-4 space-y-1 mb-2">
-                            <Link to="/dashboard/tests/mock/medical" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Medical</Link>
+                            <Link to="/dashboard/tests/mock/agriculture" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Agriculture</Link>
                             <Link to="/dashboard/tests/mock/engineering" onClick={() => setIsOpen(false)} className="block py-1.5 text-xs text-slate-300 hover:text-primary-500">Engineering</Link>
                           </div>
                         )}
@@ -295,7 +318,7 @@ const Header = ({ setIsOpen }) => {
                         // If it's a test, we could navigate to a preview or dashboard
                         // Actually just navigate to dashboard and let them find it, or we can go to /tests
                         if (test.testType === 'mock') {
-                           navigate(`/dashboard/tests/mock/${test.category || 'medical'}`);
+                           navigate(`/dashboard/tests/mock/${test.category || 'agriculture'}`);
                         } else {
                            navigate(`/dashboard/tests/chapter-wise/${test.subject || 'physics'}`);
                         }
@@ -416,6 +439,7 @@ export default function Dashboard() {
 
               {/* Shared Routes */}
               <Route path="/materials" element={<ResourcesComponent />} />
+              <Route path="/materials/:stream" element={<ResourcesComponent />} />
               <Route path="/settings" element={<SettingsArea />} />
               
               {/* Catch-all route to redirect unauthorized access to overview */}

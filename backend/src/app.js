@@ -9,7 +9,7 @@ const studentRoutes = require("./routes/student.routes");
 const instructorRoutes = require("./routes/instructor.routes");
 const adminRoutes = require("./routes/admin.routes");
 const helmet = require("helmet");
-const resourceRoutes = require("./routes/resource.route");
+const resourceRoutes = require("./routes/resources.routes");
 
 const rateLimit = require("express-rate-limit");
 
