@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import {
-  ChevronRight, ArrowLeft, BookOpen, Folder, FileText, Maximize2, Minimize2, Lock
+  ChevronRight, ArrowLeft, BookOpen, Folder, FileText, Maximize2, Minimize2, Lock, List, TrendingUp, Zap, Search
 } from 'lucide-react';
 
 // ── Navigation level constants ───────────────────────────────────────────────
@@ -11,6 +11,9 @@ const LEVELS = ['streams', 'subjects', 'cards', 'chapters', 'files'];
 export default function StudentResources() {
   const { streamId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const topicQuery = searchParams.get('topic');
+  const subjectQuery = searchParams.get('subject');
 
   const [streams, setStreams] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -28,11 +31,25 @@ export default function StudentResources() {
   const [cardMeta, setCardMeta] = useState({ isPremium: false, hasPurchased: true, price: 0 });
   const [loading, setLoading] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
+  const [priorities, setPriorities] = useState(null);
+  const [showPriorities, setShowPriorities] = useState(false);
+  const [activePrioritySubject, setActivePrioritySubject] = useState('Mathematics');
 
   // Load streams on mount
   useEffect(() => {
     api.get('/resources/streams').then(r => setStreams(r.data.streams || [])).catch(() => {});
+    api.get('/resources/priorities').then(r => setPriorities(r.data)).catch(() => {});
   }, []);
+
+  // Handle incoming search queries from 30-day plan
+  useEffect(() => {
+    if (topicQuery && priorities) {
+      setShowPriorities(true);
+      if (subjectQuery && priorities[subjectQuery]) {
+        setActivePrioritySubject(subjectQuery);
+      }
+    }
+  }, [topicQuery, subjectQuery, priorities]);
 
   // Handle direct navigation via streamId param
   useEffect(() => {
@@ -94,6 +111,7 @@ export default function StudentResources() {
     if (chapter) { setChapter(null); return; }
     if (card) { setCard(null); return; }
     if (subject) { setSubject(null); return; }
+    if (showPriorities) { setShowPriorities(false); return; }
     if (stream) { setStream(null); return; }
   };
 
@@ -156,7 +174,7 @@ export default function StudentResources() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold uppercase tracking-widest text-slate-400">
-            <span className="cursor-pointer hover:text-white" onClick={() => { setStream(null); setSubject(null); setCard(null); setChapter(null); setViewingFile(null); }}>Materials</span>
+            <span className="cursor-pointer hover:text-white" onClick={() => { setStream(null); setSubject(null); setCard(null); setChapter(null); setViewingFile(null); setShowPriorities(false); }}>Materials</span>
             <ChevronRight className="w-3 h-3" />
             <span className={subject ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => { setSubject(null); setCard(null); setChapter(null); setViewingFile(null); }}>{stream.name}</span>
             {subject && <><ChevronRight className="w-3 h-3" /><span className={card ? 'cursor-pointer hover:text-white' : 'text-white'} onClick={() => { setCard(null); setChapter(null); setViewingFile(null); }}>{subject.name}</span></>}
@@ -167,25 +185,58 @@ export default function StudentResources() {
         </div>
       )}
 
+      {/* Breadcrumb for 'Materials' root when showing priorities */}
+      {!stream && showPriorities && (
+        <div className="flex items-center gap-4">
+          <button onClick={() => setShowPriorities(false)} className="p-2 text-slate-400 hover:text-white border border-dark-700 hover:border-primary-500 transition-colors shrink-0">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+            <span className="cursor-pointer hover:text-white" onClick={() => setShowPriorities(false)}>Materials</span>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-white">Chapter Weightage</span>
+          </div>
+        </div>
+      )}
+
       {loading && <div className="text-center text-slate-400 py-8 text-xs font-bold uppercase tracking-widest">Loading...</div>}
 
-      {/* ── Level: Streams ── */}
-      {!stream && !loading && (
+      {/* ── Level: Streams (Home) ── */}
+      {!stream && !loading && !showPriorities && (
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-black text-white uppercase flex items-center tracking-tight">
-              <span className="w-8 h-1 bg-primary-500 mr-3"></span>Materials & Resources
-            </h1>
-            <p className="text-slate-400 mt-2">Select your stream to explore study materials.</p>
-          </div>
-          {streams.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 p-12 text-center">
-              <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No streams available yet</p>
-              <p className="text-slate-500 text-xs mt-2">Your instructor hasn't created any streams yet.</p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase flex items-center tracking-tight">
+                <span className="w-8 h-1 bg-primary-500 mr-3"></span>Materials & Resources
+              </h1>
+              <p className="text-slate-400 mt-2">Select your stream or view important chapter weightages.</p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {priorities && (
+              <button 
+                onClick={() => setShowPriorities(true)}
+                className="bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-3 text-white font-black uppercase text-xs tracking-widest flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-[0_4px_20px_rgba(245,158,11,0.2)]">
+                <TrendingUp className="w-4 h-4" />
+                Chapter Weightage
+              </button>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Quick Access Card for Chapter Weightage */}
+            <div className="md:col-span-1">
+               <button onClick={() => setShowPriorities(true)}
+                className="w-full h-full group bg-dark-800 p-8 border-l-4 border-l-amber-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 text-left hover:bg-dark-700 transition-all flex flex-col">
+                <Zap className="w-10 h-10 text-amber-500 mb-4" />
+                <h2 className="text-2xl font-black text-white uppercase tracking-wide">Chapter Priorities</h2>
+                <p className="text-slate-500 text-xs mt-2 uppercase font-bold tracking-wider">JEE/NEET High Weightage Topics</p>
+                <div className="flex items-center text-amber-500 text-xs font-bold uppercase tracking-widest mt-auto pt-8">
+                  View List <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+            </div>
+
+            {/* Existing Streams */}
+            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
               {streams.map(s => (
                 <button key={s._id} onClick={() => selectStream(s)}
                   className="group bg-dark-800 p-8 border-l-4 border-l-primary-500 border-t border-t-dark-700 border-r border-r-dark-700 border-b border-b-dark-700 text-left hover:bg-dark-700 transition-all">
@@ -196,8 +247,97 @@ export default function StudentResources() {
                   </div>
                 </button>
               ))}
+              {streams.length === 0 && (
+                <div className="bg-dark-800 border border-dark-700 p-8 text-center flex flex-col items-center justify-center opacity-50">
+                  <BookOpen className="w-10 h-10 text-slate-600 mb-3" />
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">No streams active</p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Level: Chapter Weightage ── */}
+      {!stream && showPriorities && priorities && (
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-black text-white uppercase flex items-center tracking-tight">
+                <span className="w-8 h-1 bg-amber-500 mr-3"></span>Chapter Weightage
+              </h1>
+              <p className="text-slate-400 mt-2 font-bold uppercase tracking-widest text-[10px]">Priority-wise distribution for JEE/NEET</p>
+            </div>
+            
+            <div className="flex bg-dark-800 p-1 border border-dark-700">
+              {Object.keys(priorities).map(sub => (
+                <button 
+                  key={sub}
+                  onClick={() => setActivePrioritySubject(sub)}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${activePrioritySubject === sub ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}>
+                  {sub}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-dark-800 border border-dark-700 overflow-hidden">
+            <div className="overflow-x-auto">
+              {topicQuery && (
+                <div className="px-6 py-3 bg-amber-500/10 border-b border-dark-700 flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest flex items-center gap-2">
+                    <Search className="w-3 h-3" /> Showing results for "{topicQuery}"
+                  </span>
+                  <button onClick={() => navigate('/dashboard/materials')} className="text-[10px] font-black uppercase text-slate-400 hover:text-white underline tracking-widest">
+                    Clear search
+                  </button>
+                </div>
+              )}
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-dark-700 bg-dark-900/50">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Priority</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Chapter / Topic</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Weightage (Questions)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-dark-700/50">
+                  {priorities[activePrioritySubject]
+                    .filter(item => !topicQuery || item.topic.toLowerCase().includes(topicQuery.toLowerCase()))
+                    .map((item, idx) => (
+                    <tr key={idx} className="hover:bg-dark-700/30 transition-colors group">
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-black ${item.priority <= 5 ? 'bg-red-500/20 text-red-500' : item.priority <= 10 ? 'bg-amber-500/20 text-amber-500' : 'bg-slate-700 text-slate-400'}`}>
+                          {item.priority}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-bold text-white uppercase tracking-wide group-hover:text-amber-400 transition-colors">{item.topic}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                           <div className="flex-1 h-1.5 bg-dark-900 rounded-full overflow-hidden max-w-[100px]">
+                              <div 
+                                className={`h-full rounded-full ${item.weight.includes('-') ? 'bg-amber-500' : parseInt(item.weight) >= 4 ? 'bg-red-500' : 'bg-primary-500'}`} 
+                                style={{ width: `${(parseInt(item.weight.split('-')[0]) / 6) * 100}%` }}>
+                              </div>
+                           </div>
+                           <span className="text-[10px] font-black text-slate-300 bg-dark-900 px-2 py-0.5 border border-dark-700 uppercase">{item.weight}</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div className="bg-amber-500/5 border border-amber-500/10 p-4 flex items-start gap-4">
+            <TrendingUp className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+              Note: Weightage is based on historical exam analysis and standard trends. Use this as a guide to prioritize your revision. Topics with higher priority (lower numbers) generally have higher frequency or weightage in competitive exams.
+            </p>
+          </div>
         </div>
       )}
 

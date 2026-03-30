@@ -10,8 +10,17 @@ const ResourceCard = require('../models/ResourceCard');
 const Chapter = require('../models/Chapter');
 const ResourceFile = require('../models/ResourceFile');
 
+const priorityData = require('../utils/priorityData.json');
+
 const resourceRouter = express.Router();
 const instructorOnly = [auth, allowRoles('instructor', 'admin')];
+
+// ─── PRIORITIES ──────────────────────────────────────────────────────────────
+
+// GET chapter priorities (Public for Landing page stats)
+resourceRouter.get('/priorities', (req, res) => {
+  res.json(priorityData);
+});
 
 // ─── STREAMS ─────────────────────────────────────────────────────────────────
 

@@ -344,6 +344,8 @@ import StudentTestList from './student/StudentTestList';
 import TestTakingInterface from './student/TestTakingInterface';
 import StudentResults from './student/StudentResults';
 import StudentResources from './student/StudentResources';
+import Plan30Days from './student/Plan30Days';
+import Plan45Days from './student/Plan45Days';
 
 import InstructorOverview from './instructor/InstructorOverview';
 import InstructorEditTest from './instructor/InstructorEditTest';
@@ -421,6 +423,8 @@ export default function Dashboard() {
               {/* Shared Routes */}
               <Route path="/materials" element={<ResourcesComponent />} />
               <Route path="/materials/:streamId" element={<ResourcesComponent />} />
+              <Route path="/plan-30" element={<Plan30Days />} />
+              <Route path="/plan-45" element={<Plan45Days />} />
               <Route path="/settings" element={<SettingsArea />} />
               
               {/* Catch-all route to redirect unauthorized access to overview */}

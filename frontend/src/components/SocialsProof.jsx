@@ -10,8 +10,11 @@ const SocialProof = () => {
     ];
 
     return (
-        <div className="py-12 border-y border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20">
+        <div className="py-12 border-y border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/20 relative">
             <div className="max-w-7xl mx-auto px-6">
+                <div className="text-center mb-8">
+                    <p className="text-xs font-black uppercase tracking-[0.3em] text-accent/60">Trusted by Serious Aspirants</p>
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {stats.map((stat, index) => (
                         <div key={index} className="flex items-center space-x-4">
